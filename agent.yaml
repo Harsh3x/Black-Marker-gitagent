@@ -2,7 +2,7 @@ spec_version: "0.1.0"
 name: my-agent
 version: 0.1.0
 description: A helpful assistant agent
-author: ""
+author: "Harsh"
 license: MIT
 model:
   preferred: "openai:gpt-4o-mini"
