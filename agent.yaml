@@ -5,7 +5,7 @@ description: A helpful assistant agent
 author: ""
 license: MIT
 model:
-  preferred: claude-sonnet-4-5-20250929
+  preferred: "openai:gpt-4o-mini"
   constraints:
     temperature: 0.3
     max_tokens: 4096
