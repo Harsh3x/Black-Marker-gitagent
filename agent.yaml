@@ -10,6 +10,9 @@ model:
     temperature: 0.3
     max_tokens: 4096
 skills: []
+session:
+  mode: continuous
+  history: true
 tools: []
 runtime:
   max_turns: 30
