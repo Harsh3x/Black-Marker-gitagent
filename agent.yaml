@@ -1,17 +1,10 @@
 spec_version: "0.1.0"
-name: my-agent
+name: gitagent
 version: 0.1.0
-description: A helpful assistant agent
-author: ""
-license: MIT
+description: Gitclaw agent for gitagent
 model:
-  preferred: gpt-4o
-  constraints:
-    temperature: 0.3
-    max_tokens: 4096
-skills: []
-tools: []
+  preferred: "openai:gpt-4o-mini"
+  fallback: []
+tools: [cli, read, write, memory]
 runtime:
-  max_turns: 30
-  timeout: 120
-tags: []
+  max_turns: 50
