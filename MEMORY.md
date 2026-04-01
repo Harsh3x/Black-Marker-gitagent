@@ -1,0 +1,1 @@
+Initiated redaction process for a legal deposition document that contains PII and confidential information.
