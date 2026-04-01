@@ -1,0 +1,46 @@
+==========================================
+       BLACK-MARKER REDACTION REPORT
+==========================================
+Document : test_deposition.pdf
+Processed: 2026-04-01 19:54:48
+Model    : gpt-4o-mini
+
+SUMMARY
+-------
+Unique sensitive strings : 13
+Redaction boxes applied  : 35
+Pages affected           : 1
+Output file              : test_deposition_REDACTED.pdf
+
+REDACTIONS BY CATEGORY
+----------------------
+Category                        Strings   Boxes
+------------------------------  --------  ------
+Address                               2      14
+Confidential / Proprietary            1       4
+Date of Birth                         1       3
+Email Address                         2       2
+Financial Data                        2       2
+Medical Information                   1       2
+Phone Number                          1       1
+Personal Name                         2       6
+Social Security Number                1       1
+
+UNMATCHED (10 — manual review required)
+--------------------------------------------
+  [Personal Name]  text not found in text layer
+  [Address]  text not found in text layer
+  [Date of Birth]  text not found in text layer
+  [Social Security Number]  text not found in text layer
+  [Address]  text not found in text layer
+  [Medical Information]  text not found in text layer
+  [Personal Name]  text not found in text layer
+  [Confidential / Proprietary]  text not found in text layer
+  [Email Address]  text not found in text layer
+  [Email Address]  text not found in text layer
+These may exist in scanned/image regions.
+
+==========================================
+Original file NOT placed in /output.
+Only the redacted copy exists.
+==========================================

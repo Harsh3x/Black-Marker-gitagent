@@ -1,0 +1,76 @@
+name: redact_document
+description: End-to-end autonomous PDF redaction pipeline
+version: 1.0.0
+
+steps:
+  - id: extract_text
+    description: Extract all text and word coordinates from the input PDF
+    tool: extract_pdf_text
+    input:
+      pdf_path: "{{ input.pdf_path }}"
+    on_failure: abort
+
+  - id: hunt_pii
+    description: Scan extracted text for all PII and confidential data
+    skill: hunt-for-pii
+    input:
+      page_data: "{{ steps.extract_text.output }}"
+    on_failure: abort
+
+  - id: check_findings
+    description: Gate — if no findings, skip redaction
+    if: "{{ steps.hunt_pii.output | length == 0 }}"
+    action: complete
+    message: "No sensitive data detected. Document appears clean."
+
+  - id: map_coordinates
+    description: Map each PII finding to exact pixel coordinates on the PDF
+    skill: map-redaction-coordinates
+    input:
+      findings: "{{ steps.hunt_pii.output }}"
+      page_data: "{{ steps.extract_text.output }}"
+    on_failure: abort
+
+  - id: apply_redactions
+    description: Physically draw black boxes over all sensitive regions
+    tool: apply_pdf_redaction
+    input:
+      pdf_path: "{{ input.pdf_path }}"
+      redactions: "{{ steps.map_coordinates.output }}"
+      output_path: "{{ input.pdf_path | replace('.pdf', '_REDACTED.pdf') | prepend('output/') }}"
+    on_failure: abort
+
+  - id: generate_report
+    description: Write redaction summary report (no sensitive values)
+    action: write_file
+    path: "output/redaction_report.txt"
+    content: |
+      ==========================================
+      BLACK-MARKER REDACTION REPORT
+      ==========================================
+      Document: {{ input.pdf_path | basename }}
+      Processed: {{ now }}
+      
+      SUMMARY
+      -------
+      Total items redacted : {{ steps.map_coordinates.output | length }}
+      Pages affected       : {{ steps.apply_redactions.output.pages_affected | join(', ') }}
+      Output file          : {{ steps.apply_redactions.output.output_path }}
+      
+      CATEGORIES REDACTED
+      -------------------
+      {{ steps.hunt_pii.output | group_by('category') | format_counts }}
+      
+      UNMATCHED FINDINGS (manual review required)
+      --------------------------------------------
+      {{ steps.map_coordinates.output | filter(reason='UNMATCHED') | length }} items require manual review
+      
+      ==========================================
+      Original file has been removed from output.
+      Only the redacted copy exists in /output.
+      ==========================================
+
+  - id: cleanup
+    description: Remove original file from output directory if it was copied there
+    action: delete_if_exists
+    path: "output/{{ input.pdf_path | basename }}"

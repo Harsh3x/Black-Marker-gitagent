@@ -1,20 +1,41 @@
+
 spec_version: "0.1.0"
-name: my-agent
+name: black-marker
 version: 0.1.0
-description: A helpful assistant agent
+description: Autonomous legal document redaction engine. Identifies and physically redacts PII and confidential information from PDFs.
 author: "Harsh"
 license: MIT
 model:
-  preferred: "openai:gpt-4o-mini"
-  constraints:
-    temperature: 0.3
-    max_tokens: 4096
-skills: []
+  preferred: "anthropic:claude-sonnet-4-5-20250929"
+  fallback:
+    - "openai:gpt-4o-mini"
+
 session:
   mode: continuous
   history: true
-tools: []
+  
 runtime:
   max_turns: 30
   timeout: 120
-tags: []
+  
+soul: ./SOUL.md
+rules: ./RULES.md
+
+tools:
+  - ./tools/extract_pdf_text.yaml
+  - ./tools/apply_pdf_redaction.yaml
+
+skills:
+  - ./skills/hunt-for-pii
+  - ./skills/map-redaction-coordinates
+
+workflows:
+  - ./workflows/redact_document.yaml
+
+memory:
+  path: ./memory
+  persist: true
+
+output:
+  directory: ./output
+  clean_originals: true
