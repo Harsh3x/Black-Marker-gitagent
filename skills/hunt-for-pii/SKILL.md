@@ -2,7 +2,6 @@
 name: hunt-for-pii
 description: skill to identify personally identifiable information (PII) and confidential business information in extracted PDF text
 license: MIT
-allowed-tools: ""
 metadata:
   author: "Harsh"
   version: "1.0.0"
@@ -50,14 +49,6 @@ Scan for ALL of the following categories. Be aggressive — flag anything that c
 - **Specific salary/compensation figures**
 - **Loan amounts tied to individuals**
 
-### Sensitive Personal
-- **Immigration status**
-- **Sexual orientation or gender identity** (if mentioned)
-- **Religious beliefs** (if tied to an individual)
-- **Criminal history** (arrests, charges, convictions)
-
----
-
 ## Confidential Business Categories
 
 - **Trade secrets**: proprietary processes, formulas, algorithms described in detail
@@ -67,17 +58,6 @@ Scan for ALL of the following categories. Be aggressive — flag anything that c
 - **Attorney-client privileged content**: anything prefixed with "Privileged and Confidential"
 - **Proprietary technical specifications**
 
----
-
-## Output Format
-
-Return a JSON array. Each item must include:
-```json
-{
-  "text": "exact text string to find and redact",
-  "category": "PII_NAME | SSN | MEDICAL | FINANCIAL | CONFIDENTIAL | ADDRESS | PHONE | EMAIL",
-}
-```
 
 ## Rules
 - When in doubt, include it — over-flagging is correct behavior

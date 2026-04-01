@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
-Black-Marker: Autonomous PDF Redaction Engine
-  1. Extract raw text from PDF
-  2. LLM returns {text, category} objects
-  3. Python searches PDF for exact text strings → coordinates
-  4. PyMuPDF draws permanent black boxes
+Black-Marker: Autonomous PDF Redaction Engine (Async Version)
+  1. Extract text page-by-page using PyMuPDF (fitz)
+  2. Concurrently query LLM per page using AsyncOpenAI
+  3. PyMuPDF searches for exact text strings -> coordinates
+  4. PyMuPDF draws permanent black boxes & scrubs metadata
   5. Report shows category breakdown
 """
 
 import sys
 import json
-import os
 import re
-from openai import OpenAI
+import os
+import asyncio
+from openai import AsyncOpenAI
 from pathlib import Path
 from collections import defaultdict
 from datetime import datetime
@@ -20,135 +21,212 @@ from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
 
-from tools.extract_pdf_text import extract_text
-
-import pdfplumber
 import fitz  # PyMuPDF
 
+# Load system prompts (Make sure these files exist in your directory)
 SOUL       = open("./SOUL.md").read()
 RULES      = open("./RULES.md").read()
 HUNT_SKILL = open("./skills/hunt-for-pii/SKILL.md").read()
+
 
 api_key = os.environ.get("OPENAI_API_KEY")
 if not api_key:
     print("[ERROR] OPENAI_API_KEY not set. Run: export OPENAI_API_KEY=sk-...")
     sys.exit(1)
 
-client = OpenAI(api_key=api_key)
+client = AsyncOpenAI(api_key=api_key)
 MODEL  = "gpt-4o-mini"
+CONCURRENCY_LIMIT = 5 # Max simultaneous page requests to OpenAI
 
 
 # ─────────────────────────────────────────────
-# Step 2: LLM identifies text + categories
+# Step 2: LLM identifies text + categories (Async)
 # ─────────────────────────────────────────────
 
-def hunt_for_pii(raw_text: str) -> list[dict]:
+async def hunt_for_pii_on_page(page_text: str, page_num: int, semaphore: asyncio.Semaphore) -> list[dict]:
     """
-    Returns list of {"text": "...", "category": "..."}.
-    Categories: PII_NAME, SSN, DOB, ADDRESS, PHONE, EMAIL,
-                MEDICAL, FINANCIAL, CONFIDENTIAL
+    Analyzes a single page for PII concurrently.
+    Returns a list of {"text": "...", "category": "..."}.
     """
+    if not page_text.strip():
+        return []
+
     system = f"{SOUL}\n\n{RULES}"
+
     user = f"""
 {HUNT_SKILL}
 
-Here is the full text of the document:
+Here is the text for PAGE {page_num} of the document:
 
-{raw_text}
+{page_text}
 
-Return a single valid JSON array of objects with exactly two fields each:
+Return a JSON object with a single key "findings" containing an array of objects.
+Each object must have exactly two fields:
   - "text": the EXACT string as it appears in the document
   - "category": one of PII_NAME | SSN | DOB | ADDRESS | PHONE | EMAIL | MEDICAL | FINANCIAL | CONFIDENTIAL
 
 Deduplicate — include each unique text string once only.
-Do not wrap in markdown fences.
 
-Example:
-[
-  {{"text": "John Doe", "category": "PII_NAME"}},
-  {{"text": "523-88-4471", "category": "SSN"}},
-  {{"text": "4721 Maple Grove Drive", "category": "ADDRESS"}},
-  {{"text": "Project Nighthawk", "category": "CONFIDENTIAL"}},
-  {{"text": "March 14, 1979", "category": "DOB"}}
-]
+Example expected output:
+{{
+  "findings": [
+    {{"text": "John Doe", "category": "PII_NAME"}},
+    {{"text": "523-88-4471", "category": "SSN"}}
+  ]
+}}
 """
+    # Use semaphore to limit concurrent requests and avoid rate limits
+    async with semaphore:
+        try:
+            response = await client.chat.completions.create(
+                model=MODEL,
+                max_tokens=2048,
+                response_format={ "type": "json_object" }, # Forces pure JSON output
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user",   "content": user}
+                ]
+            )
+            raw = response.choices[0].message.content
+            findings = json.loads(raw).get("findings", [])
+            
+            # Attach page number for debugging/reporting context
+            for f in findings:
+                f["page_num"] = page_num
+                
+            return findings
+        
+        except Exception as e:
+            print(f"      [!] Error processing page {page_num}: {e}")
+            return []
 
-    response = client.chat.completions.create(
-        model=MODEL,
-        max_tokens=2048,
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user",   "content": user}
-        ]
-    )
 
-    raw = response.choices[0].message.content.strip()
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-    raw = raw.strip()
+async def process_document_async(pdf_path: str) -> list[dict]:
+    """
+    Extracts text page-by-page and runs them through the LLM concurrently.
+    """
+    doc = fitz.open(pdf_path)
+    tasks = []
+    semaphore = asyncio.Semaphore(CONCURRENCY_LIMIT)
+    
+    print(f"      ✓ Loaded PDF with {len(doc)} pages")
 
-    findings = json.loads(raw)
-    assert isinstance(findings, list)
-    return [
-        {"text": str(f["text"]), "category": str(f.get("category", "UNKNOWN"))}
-        for f in findings if f.get("text")
-    ]
+    for page_num, page in enumerate(doc, start=1):
+        text = page.get_text()
+        tasks.append(hunt_for_pii_on_page(text, page_num, semaphore))
+        
+    doc.close()
+
+    # Wait for all pages to finish processing
+    results = await asyncio.gather(*tasks)
+    
+    # Flatten results and deduplicate
+    all_findings = []
+    seen = set()
+    
+    for page_findings in results:
+        for f in page_findings:
+            if not f.get("text"): 
+                continue
+                
+            text = str(f["text"])
+            category = str(f.get("category", "UNKNOWN"))
+            
+            identifier = (text, category)
+            if identifier not in seen:
+                seen.add(identifier)
+                all_findings.append({"text": text, "category": category})
+                
+    return all_findings
 
 
 # ─────────────────────────────────────────────
 # Step 3: Python finds exact coordinates
 # ─────────────────────────────────────────────
 
-def find_text_coords(pdf_path: str, findings: list[dict]) -> list[dict]:
-    """
-    Returns redaction dicts including text and category for the report.
-    """
+
+def normalize_word(w: str) -> str:
+    """Removes punctuation and makes lowercase for bulletproof comparison"""
+    return re.sub(r'[^a-zA-Z0-9]', '', w).lower()
+
+
+def find_text_coords_fitz(pdf_path: str, findings: list[dict]) -> list[dict]:
     redactions = []
+    doc = fitz.open(pdf_path)
 
-    # Build a lookup: text → category
-    category_map = {f["text"]: f["category"] for f in findings}
-    texts = list(category_map.keys())
+    for page_num, page in enumerate(doc, start=1):
+        page_words = page.get_text("words")
+        
+        # Pre-process words: ignore punctuation-only blocks and standardize text
+        clean_page_words = []
+        for w in page_words:
+            norm = normalize_word(w[4])
+            if norm:
+                clean_page_words.append((norm, w))
 
-    with pdfplumber.open(pdf_path) as pdf:
-        for page_num, page in enumerate(pdf.pages, start=1):
-            page_text = page.extract_text() or ""
-            words = page.extract_words(x_tolerance=3, y_tolerance=3, keep_blank_chars=False)
+        for finding in findings:
+            text = finding["text"]
+            category = finding["category"]
+            
+            # ATTEMPT 1: Native Search (Fast, works for single unbroken lines)
+            instances = page.search_for(text)
+            if instances:
+                for inst in instances:
+                    redactions.append({
+                        "page_number": page_num,
+                        "x0": inst.x0, "y0": inst.y0, "x1": inst.x1, "y1": inst.y1,
+                        "text": text, "category": category
+                    })
+                continue
+            
+            # ATTEMPT 2: Fuzzy Word-Sequence Matcher 
+            # (Catches line breaks & intruding line numbers like "25")
+            target_words = [normalize_word(w) for w in text.split()]
+            target_words = [w for w in target_words if w] 
+            
+            if not target_words:
+                continue
 
-            for text in texts:
-                pattern = r"\s+".join(re.escape(t) for t in text.split())
-                for match in re.finditer(pattern, page_text, re.IGNORECASE):
-                    matched_words = find_words_in_span(page_text, words, match.start(), match.end())
-                    if matched_words:
-                        redactions.append({
-                            "page_number": page_num,
-                            "x0": min(w["x0"]    for w in matched_words) - 2,
-                            "y0": min(w["top"]    for w in matched_words) - 2,
-                            "x1": max(w["x1"]     for w in matched_words) + 2,
-                            "y1": max(w["bottom"] for w in matched_words) + 2,
-                            "text":     text,
-                            "category": category_map[text]
-                        })
+            i = 0
+            while i < len(clean_page_words):
+                # If we find the first word, start tracking the sequence
+                if clean_page_words[i][0] == target_words[0]:
+                    match_rects = []
+                    p_idx = i
+                    t_idx = 0
+                    skips = 0
 
+                    while p_idx < len(clean_page_words) and t_idx < len(target_words):
+                        if clean_page_words[p_idx][0] == target_words[t_idx]:
+                            # Word matches! Add to redaction list
+                            match_rects.append(clean_page_words[p_idx][1])
+                            t_idx += 1
+                            skips = 0  # Reset skip counter
+                        else:
+                            # Artifact detected (e.g. Line number 25). Skip it.
+                            skips += 1
+                            if skips > 4: # Allow up to 4 intruding artifacts between target words
+                                break
+                        p_idx += 1
+                    
+                    if t_idx == len(target_words):
+                        # Success! We found the sequence despite interruptions.
+                        for w_rect in match_rects:
+                            redactions.append({
+                                "page_number": page_num,
+                                "x0": w_rect[0], "y0": w_rect[1], "x1": w_rect[2], "y1": w_rect[3],
+                                "text": text, "category": category
+                            })
+                        i = p_idx - 1 # Fast forward past the matched phrase
+                i += 1
+                    
+    doc.close()
     return redactions
 
 
-def find_words_in_span(page_text: str, words: list, start: int, end: int) -> list:
-    matched, cursor = [], 0
-    for word in words:
-        idx = page_text.find(word["text"], cursor)
-        if idx == -1:
-            continue
-        word_end = idx + len(word["text"])
-        cursor = word_end
-        if word_end > start and idx < end:
-            matched.append(word)
-    return matched
-
 
 # ─────────────────────────────────────────────
-# Step 4: Draw permanent black boxes
+# Step 4: Draw permanent black boxes & Scrub Metadata
 # ─────────────────────────────────────────────
 
 def apply_black_boxes(pdf_path: str, redactions: list, output_path: str) -> dict:
@@ -164,12 +242,31 @@ def apply_black_boxes(pdf_path: str, redactions: list, output_path: str) -> dict
             continue
         page = doc[page_idx]
         for r in page_reds:
-            page.add_redact_annot(fitz.Rect(r["x0"], r["y0"], r["x1"], r["y1"]),
-                                  fill=(0, 0, 0), cross_out=False)
-        page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE,
-                               graphics=fitz.PDF_REDACT_LINE_ART_NONE)
+             # FIX: Shrink the bounding box to prevent eating adjacent lines
+            height = r["y1"] - r["y0"]
+            width = r["x1"] - r["x0"]
+            
+            # 15% vertical reduction on top and bottom avoids line-spacing bleeds
+            margin_y = height * 0.18
+            # 1% horizontal reduction avoids eating commas/periods next to the redacted word
+            margin_x = width * 0.01  
+            
+            rect = fitz.Rect(
+                r["x0"] + margin_x, 
+                r["y0"] + margin_y, 
+                r["x1"] - margin_x, 
+                r["y1"] - margin_y
+            )
+
+            page.add_redact_annot(rect, fill=(0, 0, 0), cross_out=False)
+            
+        page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE, graphics=fitz.PDF_REDACT_LINE_ART_NONE)
         pages_affected.add(page_idx + 1)
 
+    # SECURE: Scrub document metadata (Author, title, etc.) to prevent hidden PII leaks
+    doc.set_metadata({}) 
+
+    # Save completely clean document
     doc.save(output_path, garbage=4, deflate=True, clean=True)
     doc.close()
 
@@ -182,7 +279,7 @@ def apply_black_boxes(pdf_path: str, redactions: list, output_path: str) -> dict
 
 
 # ─────────────────────────────────────────────
-# Report
+# Report Generation
 # ─────────────────────────────────────────────
 
 CATEGORY_LABELS = {
@@ -203,12 +300,10 @@ def generate_report(pdf_path: str, findings: list[dict], redactions: list[dict],
     found_texts  = set(r["text"] for r in redactions)
     unmatched    = [f for f in findings if f["text"] not in found_texts]
 
-    # Count boxes per category
     boxes_by_cat = defaultdict(int)
     for r in redactions:
         boxes_by_cat[r["category"]] += 1
 
-    # Unique texts per category
     texts_by_cat = defaultdict(set)
     for f in findings:
         texts_by_cat[f["category"]].add(f["text"])
@@ -218,13 +313,13 @@ def generate_report(pdf_path: str, findings: list[dict], redactions: list[dict],
     report += "==========================================\n"
     report += f"Document : {Path(pdf_path).name}\n"
     report += f"Processed: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-    report += f"Model    : {MODEL}\n\n"
+    report += f"Model    : {MODEL} (Async)\n\n"
 
     report += "SUMMARY\n"
     report += "-------\n"
     report += f"Unique sensitive strings : {len(findings)}\n"
     report += f"Redaction boxes applied  : {len(redactions)}\n"
-    report += f"Pages affected           : {', '.join(map(str, pages))}\n"
+    report += f"Pages affected           : {', '.join(map(str, pages)) if pages else 'None'}\n"
     report += f"Output file              : {Path(output_path).name}\n\n"
 
     report += "REDACTIONS BY CATEGORY\n"
@@ -242,12 +337,12 @@ def generate_report(pdf_path: str, findings: list[dict], redactions: list[dict],
         report += "-" * 44 + "\n"
         for f in unmatched:
             label = CATEGORY_LABELS.get(f["category"], f["category"])
-            report += f"  [{label}]  text not found in text layer\n"
-        report += "These may exist in scanned/image regions.\n"
+            report += f"  [{label}]  {f['text']}\n"
+        report += "These may exist in scanned/image regions or span across line-breaks.\n"
 
     report += "\n==========================================\n"
     report += "Original file NOT placed in /output.\n"
-    report += "Only the redacted copy exists.\n"
+    report += "Metadata scrubbed. Only the redacted copy exists.\n"
     report += "==========================================\n"
 
     with open("output/redaction_report.txt", "w") as fh:
@@ -257,40 +352,38 @@ def generate_report(pdf_path: str, findings: list[dict], redactions: list[dict],
 
 
 # ─────────────────────────────────────────────
-# Main
+# Main Async Orchestrator
 # ─────────────────────────────────────────────
 
-def redact(pdf_path: str):
-    print(f"\n[BLACK-MARKER] Initiating redaction: {pdf_path}")
+async def redact_async(pdf_path: str):
+    print(f"\n[BLACK-MARKER] Initiating async redaction: {pdf_path}")
     print(f"[BLACK-MARKER] Model: {MODEL}")
     print("=" * 50)
 
-    print("[1/4] Extracting raw text from PDF...")
-    raw_text = extract_text(pdf_path)
-    print(f"      ✓ {len(raw_text)} chars extracted")
-
-    print("[2/4] Hunting for PII and confidential data...")
-    findings = hunt_for_pii(raw_text)
-    print(f"      ✓ {len(findings)} sensitive string(s) identified:")
+    print("[1/4] Extracting text & Hunting for PII concurrently...")
+    findings = await process_document_async(pdf_path)
+    
+    print(f"      ✓ {len(findings)} sensitive string(s) identified")
     for f in findings:
-        print(f"        • [{f['category']}] [REDACTED]")
+        print(f"        • [{f['text']}] [{f['category']}] [REDACTED]")
 
     if not findings:
         print("\n[BLACK-MARKER] No sensitive data detected.")
         return
 
-    print("[3/4] Searching PDF for exact text locations...")
-    redactions = find_text_coords(pdf_path, findings)
+    print("\n[2/4] Searching PDF for exact text locations...")
+    redactions = find_text_coords_fitz(pdf_path, findings)
     found_texts = set(r["text"] for r in redactions)
     unmatched_count = len([f for f in findings if f["text"] not in found_texts])
     print(f"      ✓ {len(redactions)} location(s) found, {unmatched_count} unmatched")
 
     stem = Path(pdf_path).stem
     output_path = f"output/{stem}_REDACTED.pdf"
-    print(f"[4/4] Applying permanent black-box redactions → {output_path}")
+    print(f"\n[3/4] Applying permanent black-box redactions & scrubbing metadata...")
     result = apply_black_boxes(pdf_path, redactions, output_path)
-    print(f"      ✓ {result['total_redactions']} box(es) across page(s) {result['pages_affected']}")
+    print(f"      ✓ {result['total_redactions']} box(es) across page(s) {result['pages_affected']} -> {output_path}")
 
+    print("\n[4/4] Generating Report...")
     report = generate_report(pdf_path, findings, redactions, output_path)
     print("\n" + "=" * 50)
     print(report)
@@ -298,7 +391,10 @@ def redact(pdf_path: str):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python run.py <path_to_pdf>")
+        print("Usage: python run_async.py <path_to_pdf>")
         sys.exit(1)
+        
     os.makedirs("output", exist_ok=True)
-    redact(sys.argv[1])
+    
+    # Run the async event loop
+    asyncio.run(redact_async(sys.argv[1]))
