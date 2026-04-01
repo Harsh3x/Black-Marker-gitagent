@@ -6,9 +6,7 @@ description: Autonomous legal document redaction engine. Identifies and physical
 author: "Harsh"
 license: MIT
 model:
-  preferred: "anthropic:claude-sonnet-4-5-20250929"
-  fallback:
-    - "openai:gpt-4o-mini"
+  preferred: "openai:gpt-4o-mini"
 
 session:
   mode: continuous
@@ -22,15 +20,12 @@ soul: ./SOUL.md
 rules: ./RULES.md
 
 tools:
-  - ./tools/extract_pdf_text.yaml
-  - ./tools/apply_pdf_redaction.yaml
+  - extract_pdf_text
 
 skills:
-  - ./skills/hunt-for-pii
-  - ./skills/map-redaction-coordinates
+  - ./hunt-for-pii
 
 workflows:
-  - ./workflows/redact_document.yaml
 
 memory:
   path: ./memory

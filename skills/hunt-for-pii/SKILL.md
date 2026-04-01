@@ -1,9 +1,8 @@
-
 ---
-name: hunt_for_pii
+name: hunt-for-pii
 description: skill to identify personally identifiable information (PII) and confidential business information in extracted PDF text
 license: MIT
-allowed-tools: "hunt_for_pii"
+allowed-tools: ""
 metadata:
   author: "Harsh"
   version: "1.0.0"
