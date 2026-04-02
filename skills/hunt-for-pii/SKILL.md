@@ -60,6 +60,13 @@ Scan for ALL of the following categories. Be aggressive — flag anything that c
 - **Proprietary technical specifications**
 
 
+## Output Format
+Return a single valid JSON array of objects with exactly two fields each:
+
+"text": the EXACT string as it appears in the document — same spelling, spacing, punctuation
+"category": one of PII_NAME | SSN | DOB | ADDRESS | PHONE | EMAIL | MEDICAL | FINANCIAL | CONFIDENTIAL | IP_ADDRESS | DIGITAL_ID | LICENSE
+
+
 ## Rules
 - When in doubt, include it — over-flagging is correct behavior
 - Flag every occurrence — if a name appears 12 times, flag all 12
