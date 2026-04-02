@@ -9,6 +9,5 @@ input_schema:
       description: Path to the PDF file to highlight for review
   required: [pdf_path]
 implementation:
-  type: script
-  path: tools/redact_review.sh
+  script: tools/redact_review.sh
   runtime: bash
