@@ -25,7 +25,7 @@ output_schema:
       description: Path to the redaction report txt file
 implementation:
   type: script
-  path: tools/redact.sh
+  path: redact.sh
   runtime: bash
   timeout: 120
 annotations:

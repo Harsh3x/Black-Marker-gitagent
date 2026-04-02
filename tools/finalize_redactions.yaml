@@ -22,7 +22,7 @@ output_schema:
       description: List of page numbers affected
 implementation:
   type: script
-  path: tools/finalize_redactions.sh
+  path: finalize_redactions.sh
   runtime: bash
   timeout: 60
 annotations:
