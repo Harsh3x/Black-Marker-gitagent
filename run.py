@@ -225,6 +225,84 @@ def apply_annotations(pdf_path: str, redactions: list, output_path: str, review_
 
 
 # ─────────────────────────────────────────────
+# Step 5: Report Generation
+# ─────────────────────────────────────────────
+
+CATEGORY_LABELS = {
+    "PII_NAME":     "Personal Name",
+    "SSN":          "Social Security Number",
+    "DOB":          "Date of Birth",
+    "ADDRESS":      "Address",
+    "PHONE":        "Phone Number",
+    "EMAIL":        "Email Address",
+    "MEDICAL":      "Medical Information",
+    "FINANCIAL":    "Financial Data",
+    "CONFIDENTIAL": "Confidential / Proprietary",
+    "UNKNOWN":      "Uncategorised",
+}
+
+def generate_report(pdf_path: str, findings: list[dict], redactions: list[dict], output_path: str) -> str:
+    pages        = sorted(set(r["page_number"] for r in redactions))
+    found_texts  = set(r["text"] for r in redactions)
+    unmatched    = [f for f in findings if f["text"] not in found_texts]
+
+    boxes_by_cat = defaultdict(int)
+    for r in redactions:
+        boxes_by_cat[r["category"]] += 1
+
+    texts_by_cat = defaultdict(set)
+    for f in findings:
+        texts_by_cat[f["category"]].add(f["text"])
+
+    report  = "==========================================\n"
+    report += "       BLACK-MARKER REDACTION REPORT\n"
+    report += "==========================================\n"
+    report += f"Document : {Path(pdf_path).name}\n"
+    report += f"Processed: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+    report += f"Model    : {MODEL} (Async)\n\n"
+
+    report += "SUMMARY\n"
+    report += "-------\n"
+    report += f"Unique sensitive strings : {len(findings)}\n"
+    report += f"Redaction boxes applied  : {len(redactions)}\n"
+    report += f"Pages affected           : {', '.join(map(str, pages)) if pages else 'None'}\n"
+    report += f"Output file              : {Path(output_path).name}\n\n"
+
+
+    for f in findings:
+        report += f"• {f['text']} [{f['category']}] "
+    
+
+    report += "REDACTIONS BY CATEGORY\n"
+    report += "----------------------\n"
+    report += f"{'Category':<30} {'Strings':>8}  {'Boxes':>6}\n"
+    report += f"{'-'*30}  {'-'*8}  {'-'*6}\n"
+    for cat in sorted(boxes_by_cat.keys()):
+        label   = CATEGORY_LABELS.get(cat, cat)
+        strings = len(texts_by_cat[cat])
+        boxes   = boxes_by_cat[cat]
+        report += f"{label:<30} {strings:>8}  {boxes:>6}\n"
+
+    if unmatched:
+        report += f"\nUNMATCHED ({len(unmatched)} — manual review required)\n"
+        report += "-" * 44 + "\n"
+        for f in unmatched:
+            label = CATEGORY_LABELS.get(f["category"], f["category"])
+            report += f"  [{label}]  {f['text']}\n"
+        report += "These may exist in scanned/image regions or span across line-breaks.\n"
+
+    report += "\n==========================================\n"
+    report += "Original file NOT placed in /output.\n"
+    report += "Metadata scrubbed. Only the redacted copy exists.\n"
+    report += "==========================================\n"
+
+    with open("output/redaction_report.txt", "w") as fh:
+        fh.write(report)
+
+    return report
+
+
+# ─────────────────────────────────────────────
 # Main Async Orchestrator
 # ─────────────────────────────────────────────
 
@@ -235,6 +313,10 @@ async def redact_async(pdf_path: str, review_mode: bool):
 
     print("[1/4] Extracting text & Hunting for PII concurrently...")
     findings = await process_document_async(pdf_path)
+
+    print(f"      ✓ {len(findings)} sensitive string(s) identified:")
+    for f in findings:
+        print(f"        • {f['text']} [{f['category']}]")
 
     if not findings:
         print("\n[BLACK-MARKER] No sensitive data detected.")
@@ -254,8 +336,12 @@ async def redact_async(pdf_path: str, review_mode: bool):
     result = apply_annotations(pdf_path, redactions, output_path, review_mode)
     print(f"      ✓ {result['total_redactions']} box(es) applied -> {output_path}")
 
-    # (Report generation omitted for brevity, but you can keep your existing generate_report func)
+   
+    print("\n[4/4] Generating Report...")
+    report = generate_report(pdf_path, findings, redactions, output_path)
     print("\n" + "=" * 50)
+    print(report)
+
     print(f"Task complete! Check {output_path}")
 
 
