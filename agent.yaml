@@ -1,9 +1,11 @@
+    
 spec_version: "0.1.0"
 name: black-marker
 description: Autonomous legal document redaction engine. Identifies and physically redacts PII and confidential information from PDFs.
 version: 1.0.0
 author: "Harsh"
 license: MIT
+
 
 model:
   preferred: "openai:gpt-4o-mini"
@@ -17,39 +19,33 @@ session:
 
 prompt: prompt.md
 
-# ── Custom tools (shell wrappers around run.py) ──────────────────
-plugins:
-  redact-tools:
-    enabled: true
-    source: ./plugins/redact-tools
-    
-# ── Skills ──────────────────────────────────────────────────────
+tools:
+  - tools/redact.yaml
+  - tools/redact_review.yaml
+  - tools/finalize_redactions.yaml
+
 skills:
   - skills/hunt-for-pii
 
-# ── Hooks ───────────────────────────────────────────────────────
 hooks:
   pre_tool_use:
     - script: hooks/audit.sh
       description: Audit log every redaction invocation
 
-# ── Memory ──────────────────────────────────────────────────────
 memory:
   path: memory/
   persist: true
 
-# ── Compliance (warnings fixed) ─────────────────────────────────
 compliance:
   risk_level: high
-  human_in_the_loop: true        # satisfies [high_risk_hitl] warning
+  human_in_the_loop: true
   review:
-    required: false              # satisfies [high_risk_review] warning
-    tool: redact_pdf_review      # which tool to use for review
+    required: false
+    tool: redact_pdf_review
   data_classification: confidential
   recordkeeping:
     audit_logging: true
     retention_days: 90
-    
 output:
-  directory: ./output
+  directory: ./output    
     

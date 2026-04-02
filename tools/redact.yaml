@@ -1,0 +1,26 @@
+id: redact_pdf
+name: redact_pdf
+description: >
+  Permanently redacts all PII and confidential data from a PDF by drawing solid
+  black boxes over sensitive text. Call this immediately when the user gives a
+  PDF path. Do NOT read or redact the PDF yourself — always call this tool.
+input:
+  type: object
+  properties:
+    pdf_path:
+      type: string
+      description: Path to the PDF file to redact
+  required:
+    - pdf_path
+output:
+  type: object
+  properties:
+    output_path:
+      type: string
+    total_redactions:
+      type: integer
+    pages_affected:
+      type: array
+    report_path:
+      type: string
+run: tools/redact.sh

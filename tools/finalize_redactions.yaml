@@ -1,0 +1,25 @@
+
+id: finalize_redactions
+name: finalize_redactions
+description: >
+  Converts human-approved yellow highlights in a _FOR_REVIEW.pdf into permanent
+  black redaction boxes and scrubs metadata. Call when user says "finalize",
+  "looks good", "go ahead", or "commit" after reviewing a highlighted PDF.
+input:
+  type: object
+  properties:
+    pdf_path:
+      type: string
+      description: Path to the _FOR_REVIEW.pdf to finalize
+  required:
+    - pdf_path
+output:
+  type: object
+  properties:
+    output_path:
+      type: string
+    total_redactions:
+      type: integer
+    pages_affected:
+      type: array
+run: tools/finalize_redactions.sh
