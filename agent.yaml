@@ -18,8 +18,8 @@ session:
   history: true
 
 prompt:
-  -prompt
-  -SOUL
+  -prompt.md
+  -SOUL.md
  
 tools:
   - redact
