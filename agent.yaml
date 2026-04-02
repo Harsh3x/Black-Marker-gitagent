@@ -34,10 +34,6 @@ hooks:
     - script: hooks/audit.sh
       description: Audit log every redaction invocation
 
-memory:
-  path: memory/
-  persist: true
-  
   
 runtime:
   max_turns: 30
