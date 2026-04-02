@@ -1,4 +1,4 @@
-name: redact-pdf-review
+name: redact-review
 description: Human-in-the-loop review mode. Highlights sensitive regions in yellow instead of blacking them out. Call when user says "review first", "show highlights", or "check before redacting". After calling, tell user to open the output PDF and say "finalize" when ready.
 version: 1.0.0
 input_schema:
