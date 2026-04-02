@@ -35,7 +35,12 @@ hooks:
 memory:
   path: memory/
   persist: true
-
+  
+  
+runtime:
+  max_turns: 30
+  timeout: 120
+  
 compliance:
   risk_level: high
   human_in_the_loop: true
