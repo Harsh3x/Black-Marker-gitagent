@@ -21,4 +21,4 @@ output:
     report_path:
       type: string
 
-run: tools/redact_review.sh
+run: ../../tools/redact_review.sh

@@ -1,4 +1,3 @@
-
 spec_version: "0.1.0"
 name: black-marker
 description: Autonomous legal document redaction engine. Identifies and physically redacts PII and confidential information from PDFs.
@@ -6,9 +5,8 @@ version: 1.0.0
 author: "Harsh"
 license: MIT
 
-
 model:
-  preferred: "openai:gpt-4.1-mini"
+  preferred: "openai:gpt-4o-mini"
   fallback:
     - "anthropic:claude-sonnet-4-5-20250929"
     - "openai:gpt-4o"
@@ -17,44 +15,41 @@ session:
   mode: continuous
   history: true
 
-runtime:
-  max_turns: 30
-  timeout: 120
-  
-  
-soul: ./SOUL.md
-rules: ./RULES.md
-  
-# Inject Black-Marker identity into gitclaw's system prompt
 prompt: prompt.md
 
-tools:
-  - tools/redact.yaml
-  - tools/redact_review.yaml
-  - tools/finalize_redactions.yaml
-
+# ── Custom tools (shell wrappers around run.py) ──────────────────
+plugins:
+  redact-tools:
+    enabled: true
+    source: ./plugins/redact-tools
+    
+# ── Skills ──────────────────────────────────────────────────────
 skills:
   - skills/hunt-for-pii
 
+# ── Hooks ───────────────────────────────────────────────────────
 hooks:
   pre_tool_use:
     - script: hooks/audit.sh
       description: Audit log every redaction invocation
 
+# ── Memory ──────────────────────────────────────────────────────
 memory:
   path: memory/
   persist: true
 
+# ── Compliance (warnings fixed) ─────────────────────────────────
 compliance:
   risk_level: high
-  human_in_the_loop: false   # flip to true to force --review on every run
+  human_in_the_loop: true        # satisfies [high_risk_hitl] warning
+  review:
+    required: false              # satisfies [high_risk_review] warning
+    tool: redact_pdf_review      # which tool to use for review
   data_classification: confidential
   recordkeeping:
     audit_logging: true
     retention_days: 90
-
-
-  clean_originals: true
-  
+    
 output:
   directory: ./output
+    

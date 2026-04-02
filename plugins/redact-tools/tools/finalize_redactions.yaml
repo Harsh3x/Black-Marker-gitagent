@@ -22,4 +22,4 @@ output:
     pages_affected:
       type: array
 
-run: tools/finalize_redactions.sh
+run: ../../tools/finalize_redactions.sh

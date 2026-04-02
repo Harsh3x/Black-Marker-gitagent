@@ -23,4 +23,4 @@ output:
     report_path:
       type: string
 
-run: tools/redact.sh
+run: ../../tools/redact.sh
