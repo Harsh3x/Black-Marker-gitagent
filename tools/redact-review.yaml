@@ -22,7 +22,7 @@ output_schema:
       description: Path to the findings report txt file
 implementation:
   type: script
-  path: redact_review.sh
+  path: redact-review.sh
   runtime: bash
   timeout: 120
 annotations:
