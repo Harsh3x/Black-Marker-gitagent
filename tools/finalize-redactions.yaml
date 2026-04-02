@@ -9,5 +9,5 @@ input_schema:
       description: Path to the _FOR_REVIEW.pdf to finalize
   required: [pdf_path]
 implementation:
-  script: tools/finalize-redactions.sh
+  script: finalize-redactions.sh
   runtime: bash

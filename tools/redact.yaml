@@ -10,5 +10,5 @@ input_schema:
       description: Path to the PDF file to redact
   required: [pdf_path]
 implementation:
-  script: tools/redact.sh
+  script: redact.sh
   runtime: bash
