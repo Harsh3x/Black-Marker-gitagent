@@ -28,7 +28,7 @@ load_dotenv()
 import fitz  # PyMuPDF
 
 # Load system prompts
-SOUL       = open("./prompt.md").read()
+SOUL       = open("./SOUL.md").read()
 RULES      = open("./RULES.md").read()
 HUNT_SKILL = open("./skills/hunt-for-pii/SKILL.md").read()
 

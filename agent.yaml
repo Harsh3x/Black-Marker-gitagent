@@ -17,9 +17,7 @@ session:
   mode: continuous
   history: true
 
-prompt:
-  -prompt
-  -soul
+prompt: SOUL
  
 tools:
   - redact
