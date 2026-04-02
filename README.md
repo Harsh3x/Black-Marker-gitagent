@@ -21,9 +21,8 @@ Black-Marker bridges the gap using a **Human-in-the-Loop (HITL) architecture** a
 ```bash
 black-marker-agent/
 ├── agent.yaml                 # Main config (Model: gpt-4.1-mini, tools list, memory settings)
-├── SOUL.md                    # Core Identity: "You are an ultra-paranoid legal redaction clerk..."
+├── SOUL.md                    # Core Identity: "You are an ultra-paranoid legal redaction clerk..." + # Workflow Triggers: "When user says 'Review', run redact-review."
 ├── RULES.md                   # Strict Constraints: "NEVER output PII. NEVER use cli."
-├── prompt.md                  # Workflow Triggers: "When user says 'Review', run redact-review."
 ├── .env                       # (Ignored by Git) OPENAI_API_KEY
 ├── .gitignore                 # Ignore output/ and memory/
 │
