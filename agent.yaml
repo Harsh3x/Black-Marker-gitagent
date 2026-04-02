@@ -17,7 +17,7 @@ session:
   mode: continuous
   history: true
 
-prompt: prompt.md
+soul: prompt.md
 
 tools: 
   - redact.yaml
