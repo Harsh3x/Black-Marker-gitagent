@@ -17,15 +17,16 @@ session:
   mode: continuous
   history: true
 
-soul: prompt.md
 
-tools: 
-  - redact.yaml
-  - redact_review
-  - finalize_redactions
+prompt: prompt.md
+ 
+tools:
+  - tools/redact
+  - tools/redact_review
+  - tools/finalize_redactions
+  
 
-skills:
-  - skills/hunt-for-pii
+
 
 hooks:
   pre_tool_use:
