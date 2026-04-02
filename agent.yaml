@@ -18,8 +18,6 @@ session:
   history: true
 
 
-soul: SOUL.md
-
  
 tools:
   - redact
