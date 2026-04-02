@@ -8,7 +8,7 @@ license: MIT
 
 
 model:
-  preferred: "openai:gpt-4o-mini"
+  preferred: "openai:gpt-4.1-mini"
   fallback:
     - "anthropic:claude-sonnet-4-5-20250929"
     - "openai:gpt-4o"
