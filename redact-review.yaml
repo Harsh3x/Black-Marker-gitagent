@@ -1,0 +1,32 @@
+name: redact-review
+description: Human-in-the-loop review mode. Highlights sensitive regions in yellow instead of blacking them out. Call when user says "review first", "show highlights", or "check before redacting". After calling, tell user to open the output PDF and say "finalize" when ready.
+version: 1.0.0
+input_schema:
+  type: object
+  properties:
+    pdf_path:
+      type: string
+      description: Path to the PDF file to review (e.g. "test_deposition.pdf")
+  required: [pdf_path]
+output_schema:
+  type: object
+  properties:
+    output_path:
+      type: string
+      description: Path to the highlighted review PDF
+    total_findings:
+      type: integer
+      description: Number of sensitive items highlighted
+    report_path:
+      type: string
+      description: Path to the findings report txt file
+implementation:
+  type: script
+  path: redact-review.sh
+  runtime: bash
+  timeout: 120
+annotations:
+  requires_confirmation: false
+  read_only: false
+  cost: medium
+  compliance_sensitive: true

@@ -1,0 +1,35 @@
+name: redact
+description: Permanently redacts all PII and confidential data from a PDF by drawing solid black boxes over sensitive text. Call this immediately when the user gives a PDF path with no mention of reviewing first.
+version: 1.0.0
+input_schema:
+  type: object
+  properties:
+    pdf_path:
+      type: string
+      description: Path to the PDF file to redact (e.g. "test_deposition.pdf" or "documents/contract.pdf")
+  required: [pdf_path]
+output_schema:
+  type: object
+  properties:
+    output_path:
+      type: string
+      description: Path to the redacted PDF file
+    total_redactions:
+      type: integer
+      description: Number of black boxes applied
+    pages_affected:
+      type: array
+      description: List of page numbers that were redacted
+    report_path:
+      type: string
+      description: Path to the redaction report txt file
+implementation:
+  type: script
+  path: redact.sh
+  runtime: bash
+  timeout: 120
+annotations:
+  requires_confirmation: false
+  read_only: false
+  cost: medium
+  compliance_sensitive: true
