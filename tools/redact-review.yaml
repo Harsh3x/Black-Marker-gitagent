@@ -1,11 +1,14 @@
 name: redact-pdf-review
 description: Human-in-the-loop review mode. Highlights sensitive regions in yellow instead of blacking them out. Call when user says "review first", "show highlights", or "check before redacting". After calling, tell user to open the output PDF and say "finalize" when ready.
+version: 1.0.0
 input_schema:
+  type: object
   properties:
     pdf_path:
       type: string
       description: Path to the PDF file to highlight for review
   required: [pdf_path]
 implementation:
-  script: tools/redact_review.sh
+  type: script
+  path: tools/redact_review.sh
   runtime: bash
