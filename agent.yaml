@@ -19,7 +19,10 @@ session:
 
 prompt: prompt.md
 
-tools: [redact.yaml,redact_review,finalize_redactions]
+tools: 
+  - redact.yaml
+  - redact_review
+  - finalize_redactions
 
 skills:
   - skills/hunt-for-pii
