@@ -1,4 +1,4 @@
-name: finalize_redactions
+name: finalize-redactions
 description: Converts human-approved yellow highlights in a reviewed PDF into permanent black redaction boxes and scrubs metadata. Call when user says "finalize", "looks good", "go ahead", or "commit" after reviewing a highlighted PDF.
 version: 1.0.0
 input_schema:

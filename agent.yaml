@@ -22,12 +22,12 @@ prompt: prompt.md
  
 tools:
   - redact
-  - redact_review
-  - finalize_redactions
+  - redact-review
+  - finalize-redactions
   
 
 skills:
-  - skills/hunt-for-pii
+  - hunt-for-pii
 
 hooks:
   pre_tool_use:
@@ -42,17 +42,4 @@ memory:
 runtime:
   max_turns: 30
   timeout: 120
-  
-compliance:
-  risk_level: high
-  human_in_the_loop: true
-  review:
-    required: false
-    tool: redact_pdf_review
-  data_classification: confidential
-  recordkeeping:
-    audit_logging: true
-    retention_days: 90
-output:
-  directory: ./output    
-    
+ 

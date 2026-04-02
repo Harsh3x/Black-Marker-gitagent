@@ -1,4 +1,4 @@
-name: redact_pdf
+name: redact-pdf
 description: Permanently redacts all PII and confidential data from a PDF by drawing solid black boxes over sensitive text. Call this immediately when the user gives a PDF path with no mention of reviewing first.
 version: 1.0.0
 input_schema:
