@@ -1,22 +1,12 @@
+
 name: redact
-description: Permanently redacts all PII and confidential data from a PDF by drawing solid black boxes over sensitive text. Call this immediately when the user gives a PDF path with no mention of reviewing first.
-version: 1.0.0
+description: Permanently redacts all PII and confidential data from a PDF by drawing solid black boxes. Call this immediately when the user gives a PDF path with no mention of reviewing first.
 input_schema:
-  type: object
   properties:
     pdf_path:
       type: string
-      description: Path to the PDF file to redact (e.g. "test_deposition.pdf" or "documents/contract.pdf")
+      description: Path to the PDF file to redact
   required: [pdf_path]
-
-
 implementation:
-  type: script
-  path: redact.sh
+  script: tools/redact.sh
   runtime: bash
-  timeout: 120
-annotations:
-  requires_confirmation: false
-  read_only: false
-  cost: medium
-  compliance_sensitive: true
