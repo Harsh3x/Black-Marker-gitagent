@@ -1,0 +1,34 @@
+==========================================
+       BLACK-MARKER REDACTION REPORT
+==========================================
+Document : test_deposition_OFFICIAL.pdf
+Processed: 2026-04-02 23:52:02
+Model    : gpt-4o-mini (Async)
+
+SUMMARY
+-------
+Unique sensitive strings : 28
+Redaction boxes applied  : 39
+Pages affected           : 1, 2, 3, 4
+Output file              : test_deposition_OFFICIAL_REDACTED.pdf
+
+• JANE DOE [PII_NAME] • MICHAEL DAVID HENDERSON [PII_NAME] • James Whitfield, Esq. [PII_NAME] • Linda Torres, Esq. [PII_NAME] • October 12, 2024 [DOB] • 4721 Maple Grove Drive, San Jose, CA 95129. [ADDRESS] • March 14, 1979. [DOB] • 523-88-4471. [SSN] • California Driver's License, number D8829104. [LICENSE] • Project Nighthawk [CONFIDENTIAL] • FluxReduce. [CONFIDENTIAL] • Dr. Penelope Vance [PII_NAME] • (555) 867-5309. [PHONE] • 990 Riverside Apartments, Apt 4B. [ADDRESS] • Dr. Carlos Reyes [PII_NAME] • Type 2 Diabetes [MEDICAL] • Metformin 500mg [MEDICAL] • $185,000 [FINANCIAL] • Checking Account ending in 4092 [FINANCIAL] • 122000661 [FINANCIAL] • m.henderson79@gmail.com [EMAIL] • shadow_coder@protonmail.com [EMAIL] • 192.168.100.45 [IP_ADDRESS] • Mr. Henderson [PII_NAME] • Rebecca Nguyen [PII_NAME] • Jane Doe [PII_NAME] • 14th day of October, 2024 [DOB] • Rebecca Nguyen, CCR #8841 [PII_NAME] REDACTIONS BY CATEGORY
+----------------------
+Category                        Strings   Boxes
+------------------------------  --------  ------
+Address                               2       6
+Confidential / Proprietary            2       2
+Date of Birth                         3       3
+Email Address                         2       2
+Financial Data                        3       3
+IP_ADDRESS                            1       1
+LICENSE                               1       1
+Medical Information                   2       2
+Phone Number                          1       1
+Personal Name                        10      17
+Social Security Number                1       1
+
+==========================================
+Original file NOT placed in /output.
+Metadata scrubbed. Only the redacted copy exists.
+==========================================
