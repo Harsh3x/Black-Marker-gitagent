@@ -18,7 +18,7 @@ session:
   history: true
 
 
-prompt: prompt.md
+soul: SOUL
  
 tools:
   - redact
