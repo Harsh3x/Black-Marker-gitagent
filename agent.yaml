@@ -26,7 +26,8 @@ tools:
   - tools/finalize_redactions
   
 
-
+skills:
+  - skills/hunt-for-pii
 
 hooks:
   pre_tool_use:
