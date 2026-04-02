@@ -21,9 +21,9 @@ session:
 prompt: prompt.md
  
 tools:
-  - tools/redact
-  - tools/redact_review
-  - tools/finalize_redactions
+  - redact
+  - redact_review
+  - finalize_redactions
   
 
 skills:
