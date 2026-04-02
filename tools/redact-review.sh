@@ -1,20 +1,35 @@
+
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AGENT_DIR="$(dirname "$SCRIPT_DIR")"
-INPUT="$1"
 
-PDF_PATH=$(python3 -c "import sys, json; raw = sys.argv[1]; data = json.loads(raw) if raw.startswith('{') else {}; print(data.get('pdf_path', raw))" "$INPUT")
+PDF_PATH=$(python3 -c "
+import sys, json, os, select
+raw = ''
+if select.select([sys.stdin], [], [], 0.2)[0]: raw = sys.stdin.read().strip()
+if not raw and len(sys.argv) > 1: raw = sys.argv[1].strip()
+
+path = ''
+if raw:
+    try: path = json.loads(raw).get('pdf_path', '')
+    except: path = raw
+
+if not path: path = os.environ.get('pdf_path', '')
+print(path.strip())
+" "$1")
 
 cd "$AGENT_DIR"
-mkdir -p output
+if [ -z "$PDF_PATH" ] || [ "$PDF_PATH" == "null" ]; then
+    PDF_PATH=$(ls *.pdf | head -n 1)
+fi
 
-# Run Python silently and send all output to a log file instead of the terminal
+mkdir -p output
 python3 run.py "$PDF_PATH" --review > redact_review.log 2>&1
 
 STEM=$(basename "$PDF_PATH" .pdf)
 OUTPUT="$AGENT_DIR/output/${STEM}_FOR_REVIEW.pdf"
 REPORT="$AGENT_DIR/output/redaction_report.txt"
 
-# Safely print ONLY the JSON response for GitClaw
 python3 -c "import json, os; print(json.dumps({'output_path': '${OUTPUT}', 'report_path': '${REPORT}', 'exists': os.path.exists('${OUTPUT}')}))"
-
+EOF
+chmod +x tools/redact-review.sh

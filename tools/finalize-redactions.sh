@@ -3,6 +3,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AGENT_DIR="$(dirname "$SCRIPT_DIR")"
 INPUT="$1"
 
+
 PDF_PATH=$(python3 -c "import sys, json; raw = sys.argv[1]; data = json.loads(raw) if raw.startswith('{') else {}; print(data.get('pdf_path', raw))" "$INPUT")
 
 cd "$AGENT_DIR"
