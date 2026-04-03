@@ -38,7 +38,7 @@ python3 finalize_redactions.py "$PDF_PATH" > finalize_error.log 2>&1
 STEM=$(basename "$PDF_PATH" .pdf)
 CLEAN_STEM=${STEM/_FOR_REVIEW/_FINAL_REDACTED}
 OUTPUT="$AGENT_DIR/output/${CLEAN_STEM}.pdf"
-REPORT="$AGENT_DIR/output/redaction_report.txt"
+REPORT="$AGENT_DIR/output/${CLEAN_STEM}_redaction_report.txt"
 
 python3 -c "import json, os; print(json.dumps({'output_path': '${OUTPUT}', 'report_path': '${REPORT}', 'exists': os.path.exists('${OUTPUT}')}))"
 EOF

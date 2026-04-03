@@ -28,7 +28,7 @@ python3 run.py "$PDF_PATH" --review > redact_review.log 2>&1
 
 STEM=$(basename "$PDF_PATH" .pdf)
 OUTPUT="$AGENT_DIR/output/${STEM}_FOR_REVIEW.pdf"
-REPORT="$AGENT_DIR/output/redaction_report.txt"
+REPORT="$AGENT_DIR/output/${STEM}_redaction_report.txt"
 
 python3 -c "import json, os; print(json.dumps({'output_path': '${OUTPUT}', 'report_path': '${REPORT}', 'exists': os.path.exists('${OUTPUT}')}))"
 EOF
