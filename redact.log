@@ -1,83 +1,19 @@
 
-[BLACK-MARKER] Initiating async redaction: ./input/test_deposition_2.pdf
+[BLACK-MARKER] Initiating async redaction: ./input/file3.pdf
 [BLACK-MARKER] Mode: AUTONOMOUS (Blackout)
 ==================================================
 [1/4] Extracting text & Hunting for PII concurrently...
-      ✓ Loaded PDF with 4 pages
-      ✓ 26 sensitive string(s) identified:
-        • JANE DOE [PII_NAME]
-        • MICHAEL DAVID HENDERSON [PII_NAME]
-        • October 12, 2024 [DOB]
-        • James Whitfield, Esq. [PII_NAME]
-        • Linda Torres, Esq. [PII_NAME]
-        • 4721 Maple Grove Drive, San Jose, CA 95129. [ADDRESS]
-        • March 14, 1979. [DOB]
-        • 523-88-4471. [SSN]
-        • California Driver's License, number D8829104. [LICENSE]
-        • Project Nighthawk [CONFIDENTIAL]
-        • Dr. Penelope Vance [PII_NAME]
-        • (555) 867-5309. [PHONE]
-        • 990 Riverside Apartments, Apt 4B. [ADDRESS]
-        • Dr. Carlos Reyes [PII_NAME]
-        • Type 2 Diabetes [MEDICAL]
-        • Metformin 500mg [MEDICAL]
-        • $185,000 [FINANCIAL]
-        • Checking Account ending in 4092 [FINANCIAL]
-        • 122000661 [FINANCIAL]
-        • m.henderson79@gmail.com [EMAIL]
-        • shadow_coder@protonmail.com [EMAIL]
-        • 192.168.100.45 [IP_ADDRESS]
-        • Mr. Henderson [PII_NAME]
-        • Rebecca Nguyen [PII_NAME]
-        • Jane Doe [PII_NAME]
-        • October 14th, 2024 [DOB]
-
-[2/4] Searching PDF for exact text locations...
-
-[3/4] Applying permanent black-box redactions...
-      ✓ 36 box(es) applied -> output/test_deposition_2_REDACTED.pdf
-
-[4/4] Generating Report...
-
-==================================================
-==========================================
-       BLACK-MARKER REDACTION REPORT
-==========================================
-Document : test_deposition_2.pdf
-Processed: 2026-04-03 16:24:28
-Model    : gpt-4o-mini (Async)
-
-SUMMARY
--------
-Unique sensitive strings : 26
-Redaction boxes applied  : 36
-Pages affected           : 1, 2, 3, 4
-Output file              : test_deposition_2_REDACTED.pdf
-
-• JANE DOE [PII_NAME] • MICHAEL DAVID HENDERSON [PII_NAME] • October 12, 2024 [DOB] • James Whitfield, Esq. [PII_NAME] • Linda Torres, Esq. [PII_NAME] • 4721 Maple Grove Drive, San Jose, CA 95129. [ADDRESS] • March 14, 1979. [DOB] • 523-88-4471. [SSN] • California Driver's License, number D8829104. [LICENSE] • Project Nighthawk [CONFIDENTIAL] • Dr. Penelope Vance [PII_NAME] • (555) 867-5309. [PHONE] • 990 Riverside Apartments, Apt 4B. [ADDRESS] • Dr. Carlos Reyes [PII_NAME] • Type 2 Diabetes [MEDICAL] • Metformin 500mg [MEDICAL] • $185,000 [FINANCIAL] • Checking Account ending in 4092 [FINANCIAL] • 122000661 [FINANCIAL] • m.henderson79@gmail.com [EMAIL] • shadow_coder@protonmail.com [EMAIL] • 192.168.100.45 [IP_ADDRESS] • Mr. Henderson [PII_NAME] • Rebecca Nguyen [PII_NAME] • Jane Doe [PII_NAME] • October 14th, 2024 [DOB] REDACTIONS BY CATEGORY
-----------------------
-Category                        Strings   Boxes
-------------------------------  --------  ------
-Address                               2       6
-Confidential / Proprietary            1       1
-Date of Birth                         3       2
-Email Address                         2       2
-Financial Data                        3       3
-IP_ADDRESS                            1       1
-LICENSE                               1       1
-Medical Information                   2       2
-Phone Number                          1       1
-Personal Name                         9      16
-Social Security Number                1       1
-
-UNMATCHED (1 — manual review required)
---------------------------------------------
-  [Date of Birth]  October 14th, 2024
-These may exist in scanned/image regions or span across line-breaks.
-
-==========================================
-Original file NOT placed in /output.
-Metadata scrubbed. Only the redacted copy exists.
-==========================================
-
-Task complete! Check output/test_deposition_2_REDACTED.pdf
+Traceback (most recent call last):
+  File "/home/harsh/Desktop/gitagent/run.py", line 357, in <module>
+    asyncio.run(redact_async(args.pdf_path, args.review))
+  File "/usr/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/home/harsh/Desktop/gitagent/run.py", line 317, in redact_async
+    findings = await process_document_async(pdf_path)
+  File "/home/harsh/Desktop/gitagent/run.py", line 90, in process_document_async
+    doc = fitz.open(pdf_path)
+  File "/home/harsh/.local/lib/python3.10/site-packages/pymupdf/__init__.py", line 2990, in __init__
+    raise FileNotFoundError(f"no such file: '{filename}'")
+pymupdf.FileNotFoundError: no such file: './input/file3.pdf'
