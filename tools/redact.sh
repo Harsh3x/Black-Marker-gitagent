@@ -31,7 +31,7 @@ python3 run.py "$PDF_PATH" > redact.log 2>&1
 
 STEM=$(basename "$PDF_PATH" .pdf)
 OUTPUT="./output/${STEM}_REDACTED.pdf"
-REPORT="./output/${STEM}_redaction_report.txt"
+REPORT="./output/${STEM}_REDACTION_REPORT.txt"
 
 python3 -c "import json, os; print(json.dumps({'output_path': '${OUTPUT}', 'report_path': '${REPORT}', 'exists': os.path.exists('${OUTPUT}')}))"
 EOF

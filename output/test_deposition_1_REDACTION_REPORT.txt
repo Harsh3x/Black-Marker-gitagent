@@ -1,0 +1,32 @@
+==========================================
+       BLACK-MARKER REDACTION REPORT
+==========================================
+Document : test_deposition_1.pdf
+Processed: 2026-04-03 16:24:20
+Model    : gpt-4o-mini (Async)
+
+SUMMARY
+-------
+Unique sensitive strings : 16
+Redaction boxes applied  : 17
+Pages affected           : 1
+Output file              : test_deposition_1_REDACTED.pdf
+
+• MICHAEL R. HENDERSON [PII_NAME] • 4721 Maple Grove Drive, Apt 3B, San Jose, California 95128 [ADDRESS] • March 14, 1979 [DOB] • 523-88-4471 [SSN] • Dr. Sarah J. Patel [PII_NAME] • 408-552-9931 [PHONE] • 892 Orchard Lane, Cupertino [ADDRESS] • Type 2 diabetes [MEDICAL] • Metformin 1000mg [MEDICAL] • $247,500 [FINANCIAL] • bank account ending 4829 [FINANCIAL] • m.henderson79@gmail.com [EMAIL] • mike_h1979@yahoo.com [EMAIL] • Project Nighthawk [CONFIDENTIAL] • proprietary edge-inference engine [CONFIDENTIAL] • FluxReduce [CONFIDENTIAL] REDACTIONS BY CATEGORY
+----------------------
+Category                        Strings   Boxes
+------------------------------  --------  ------
+Address                               2       2
+Confidential / Proprietary            3       4
+Date of Birth                         1       1
+Email Address                         2       2
+Financial Data                        2       2
+Medical Information                   2       2
+Phone Number                          1       1
+Personal Name                         2       2
+Social Security Number                1       1
+
+==========================================
+Original file NOT placed in /output.
+Metadata scrubbed. Only the redacted copy exists.
+==========================================
