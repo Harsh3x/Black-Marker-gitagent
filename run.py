@@ -296,7 +296,9 @@ def generate_report(pdf_path: str, findings: list[dict], redactions: list[dict],
     report += "Metadata scrubbed. Only the redacted copy exists.\n"
     report += "==========================================\n"
 
-    with open("output/redaction_report.txt", "w") as fh:
+    stem = Path(pdf_path).stem
+
+    with open(f"output/{stem}_REDACTION_REPORT.txt", "w") as fh:
         fh.write(report)
 
     return report
