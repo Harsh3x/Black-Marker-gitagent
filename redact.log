@@ -1,41 +1,29 @@
 
-[BLACK-MARKER] Initiating async redaction: ./input/test_deposition_OFFICIAL.pdf
+[BLACK-MARKER] Initiating async redaction: ./input/test_deposition.pdf
 [BLACK-MARKER] Mode: AUTONOMOUS (Blackout)
 ==================================================
 [1/4] Extracting text & Hunting for PII concurrently...
-      ✓ Loaded PDF with 4 pages
-      ✓ 26 sensitive string(s) identified:
-        • JANE DOE [PII_NAME]
-        • 2024-CV-08821 [CONFIDENTIAL]
-        • MICHAEL DAVID HENDERSON [PII_NAME]
-        • October 12, 2024 [DOB]
-        • James Whitfield, Esq. [PII_NAME]
-        • Linda Torres, Esq. [PII_NAME]
-        • 4721 Maple Grove Drive, San Jose, CA 95129. [ADDRESS]
-        • March 14, 1979. [DOB]
-        • 523-88-4471. [SSN]
-        • California Driver's License, number D8829104. [LICENSE]
-        • Dr. Penelope Vance's personal cell was (555) 867-5309. [PHONE]
-        • Project Nighthawk [CONFIDENTIAL]
-        • FluxReduce [CONFIDENTIAL]
-        • Mr. Henderson [PII_NAME]
-        • Type 2 Diabetes [MEDICAL]
-        • Metformin 500mg [MEDICAL]
-        • Dr. Carlos Reyes [PII_NAME]
-        • $185,000 [FINANCIAL]
-        • Checking Account ending in 4092 [FINANCIAL]
-        • 122000661 [FINANCIAL]
+      ✓ Loaded PDF with 1 pages
+      ✓ 14 sensitive string(s) identified:
+        • MICHAEL R. HENDERSON [PII_NAME]
+        • Michael Robert Henderson [PII_NAME]
+        • 4721 Maple Grove Drive, Apt 3B, San Jose, California 95128 [ADDRESS]
+        • March 14, 1979 [DOB]
+        • 523-88-4471 [SSN]
+        • Dr. Sarah J. Patel [PII_NAME]
+        • 408-552-9931 [PHONE]
+        • 892 Orchard Lane, Cupertino [ADDRESS]
+        • Type 2 diabetes [MEDICAL]
+        • Metformin 1000mg [MEDICAL]
+        • $247,500 [FINANCIAL]
+        • bank account ending 4829 [FINANCIAL]
         • m.henderson79@gmail.com [EMAIL]
-        • shadow_coder@protonmail.com [EMAIL]
-        • 192.168.100.45 [IP_ADDRESS]
-        • Rebecca Nguyen [PII_NAME]
-        • Jane Doe [PII_NAME]
-        • 14th day of October, 2024 [DOB]
+        • mike_h1979@yahoo.com [EMAIL]
 
 [2/4] Searching PDF for exact text locations...
 
 [3/4] Applying permanent black-box redactions...
-      ✓ 32 box(es) applied -> output/test_deposition_OFFICIAL_REDACTED.pdf
+      ✓ 14 box(es) applied -> output/test_deposition_REDACTED.pdf
 
 [4/4] Generating Report...
 
@@ -43,31 +31,28 @@
 ==========================================
        BLACK-MARKER REDACTION REPORT
 ==========================================
-Document : test_deposition_OFFICIAL.pdf
-Processed: 2026-04-03 16:12:02
+Document : test_deposition.pdf
+Processed: 2026-04-03 16:15:03
 Model    : gpt-4o-mini (Async)
 
 SUMMARY
 -------
-Unique sensitive strings : 26
-Redaction boxes applied  : 32
-Pages affected           : 1, 2, 3, 4
-Output file              : test_deposition_OFFICIAL_REDACTED.pdf
+Unique sensitive strings : 14
+Redaction boxes applied  : 14
+Pages affected           : 1
+Output file              : test_deposition_REDACTED.pdf
 
-• JANE DOE [PII_NAME] • 2024-CV-08821 [CONFIDENTIAL] • MICHAEL DAVID HENDERSON [PII_NAME] • October 12, 2024 [DOB] • James Whitfield, Esq. [PII_NAME] • Linda Torres, Esq. [PII_NAME] • 4721 Maple Grove Drive, San Jose, CA 95129. [ADDRESS] • March 14, 1979. [DOB] • 523-88-4471. [SSN] • California Driver's License, number D8829104. [LICENSE] • Dr. Penelope Vance's personal cell was (555) 867-5309. [PHONE] • Project Nighthawk [CONFIDENTIAL] • FluxReduce [CONFIDENTIAL] • Mr. Henderson [PII_NAME] • Type 2 Diabetes [MEDICAL] • Metformin 500mg [MEDICAL] • Dr. Carlos Reyes [PII_NAME] • $185,000 [FINANCIAL] • Checking Account ending in 4092 [FINANCIAL] • 122000661 [FINANCIAL] • m.henderson79@gmail.com [EMAIL] • shadow_coder@protonmail.com [EMAIL] • 192.168.100.45 [IP_ADDRESS] • Rebecca Nguyen [PII_NAME] • Jane Doe [PII_NAME] • 14th day of October, 2024 [DOB] REDACTIONS BY CATEGORY
+• MICHAEL R. HENDERSON [PII_NAME] • Michael Robert Henderson [PII_NAME] • 4721 Maple Grove Drive, Apt 3B, San Jose, California 95128 [ADDRESS] • March 14, 1979 [DOB] • 523-88-4471 [SSN] • Dr. Sarah J. Patel [PII_NAME] • 408-552-9931 [PHONE] • 892 Orchard Lane, Cupertino [ADDRESS] • Type 2 diabetes [MEDICAL] • Metformin 1000mg [MEDICAL] • $247,500 [FINANCIAL] • bank account ending 4829 [FINANCIAL] • m.henderson79@gmail.com [EMAIL] • mike_h1979@yahoo.com [EMAIL] REDACTIONS BY CATEGORY
 ----------------------
 Category                        Strings   Boxes
 ------------------------------  --------  ------
-Address                               1       1
-Confidential / Proprietary            3       3
-Date of Birth                         3       3
+Address                               2       2
+Date of Birth                         1       1
 Email Address                         2       2
-Financial Data                        3       3
-IP_ADDRESS                            1       1
-LICENSE                               1       1
+Financial Data                        2       2
 Medical Information                   2       2
 Phone Number                          1       1
-Personal Name                         8      14
+Personal Name                         3       3
 Social Security Number                1       1
 
 ==========================================
@@ -75,4 +60,4 @@ Original file NOT placed in /output.
 Metadata scrubbed. Only the redacted copy exists.
 ==========================================
 
-Task complete! Check output/test_deposition_OFFICIAL_REDACTED.pdf
+Task complete! Check output/test_deposition_REDACTED.pdf
