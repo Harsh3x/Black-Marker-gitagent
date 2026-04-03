@@ -1,19 +1,63 @@
 
-[BLACK-MARKER] Initiating async redaction: ./input/file2.pdf
+[BLACK-MARKER] Initiating async redaction: ./input/test_deposition.pdf
 [BLACK-MARKER] Mode: AUTONOMOUS (Blackout)
 ==================================================
 [1/4] Extracting text & Hunting for PII concurrently...
-Traceback (most recent call last):
-  File "/home/harsh/Desktop/gitagent/run.py", line 357, in <module>
-    asyncio.run(redact_async(args.pdf_path, args.review))
-  File "/usr/lib/python3.10/asyncio/runners.py", line 44, in run
-    return loop.run_until_complete(main)
-  File "/usr/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
-    return future.result()
-  File "/home/harsh/Desktop/gitagent/run.py", line 317, in redact_async
-    findings = await process_document_async(pdf_path)
-  File "/home/harsh/Desktop/gitagent/run.py", line 90, in process_document_async
-    doc = fitz.open(pdf_path)
-  File "/home/harsh/.local/lib/python3.10/site-packages/pymupdf/__init__.py", line 2990, in __init__
-    raise FileNotFoundError(f"no such file: '{filename}'")
-pymupdf.FileNotFoundError: no such file: './input/file2.pdf'
+      ✓ Loaded PDF with 1 pages
+      ✓ 14 sensitive string(s) identified:
+        • MICHAEL R. HENDERSON [PII_NAME]
+        • Michael Robert Henderson [PII_NAME]
+        • 4721 Maple Grove Drive, Apt 3B, San Jose, California 95128 [ADDRESS]
+        • March 14, 1979 [DOB]
+        • 523-88-4471 [SSN]
+        • Dr. Sarah J. Patel [PII_NAME]
+        • 408-552-9931 [PHONE]
+        • 892 Orchard Lane, Cupertino [ADDRESS]
+        • Type 2 diabetes [MEDICAL]
+        • Metformin 1000mg [MEDICAL]
+        • First National [FINANCIAL]
+        • My base salary is $247,500 plus equity [FINANCIAL]
+        • m.henderson79@gmail.com [EMAIL]
+        • mike_h1979@yahoo.com [EMAIL]
+
+[2/4] Searching PDF for exact text locations...
+
+[3/4] Applying permanent black-box redactions...
+      ✓ 14 box(es) applied -> output/test_deposition_REDACTED.pdf
+
+[4/4] Generating Report...
+
+==================================================
+==========================================
+       BLACK-MARKER REDACTION REPORT
+==========================================
+Document : test_deposition.pdf
+Processed: 2026-04-03 16:19:27
+Model    : gpt-4o-mini (Async)
+
+SUMMARY
+-------
+Unique sensitive strings : 14
+Redaction boxes applied  : 14
+Pages affected           : 1
+Output file              : test_deposition_REDACTED.pdf
+
+• MICHAEL R. HENDERSON [PII_NAME] • Michael Robert Henderson [PII_NAME] • 4721 Maple Grove Drive, Apt 3B, San Jose, California 95128 [ADDRESS] • March 14, 1979 [DOB] • 523-88-4471 [SSN] • Dr. Sarah J. Patel [PII_NAME] • 408-552-9931 [PHONE] • 892 Orchard Lane, Cupertino [ADDRESS] • Type 2 diabetes [MEDICAL] • Metformin 1000mg [MEDICAL] • First National [FINANCIAL] • My base salary is $247,500 plus equity [FINANCIAL] • m.henderson79@gmail.com [EMAIL] • mike_h1979@yahoo.com [EMAIL] REDACTIONS BY CATEGORY
+----------------------
+Category                        Strings   Boxes
+------------------------------  --------  ------
+Address                               2       2
+Date of Birth                         1       1
+Email Address                         2       2
+Financial Data                        2       2
+Medical Information                   2       2
+Phone Number                          1       1
+Personal Name                         3       3
+Social Security Number                1       1
+
+==========================================
+Original file NOT placed in /output.
+Metadata scrubbed. Only the redacted copy exists.
+==========================================
+
+Task complete! Check output/test_deposition_REDACTED.pdf
