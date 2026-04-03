@@ -1,5 +1,5 @@
 
-[BLACK-MARKER] Initiating async redaction: ./input/OFFICIAL.pdf
+[BLACK-MARKER] Initiating async redaction: ./input/file3.pdf
 [BLACK-MARKER] Mode: AUTONOMOUS (Blackout)
 ==================================================
 [1/4] Extracting text & Hunting for PII concurrently...
@@ -16,4 +16,4 @@ Traceback (most recent call last):
     doc = fitz.open(pdf_path)
   File "/home/harsh/.local/lib/python3.10/site-packages/pymupdf/__init__.py", line 2990, in __init__
     raise FileNotFoundError(f"no such file: '{filename}'")
-pymupdf.FileNotFoundError: no such file: './input/OFFICIAL.pdf'
+pymupdf.FileNotFoundError: no such file: './input/file3.pdf'
