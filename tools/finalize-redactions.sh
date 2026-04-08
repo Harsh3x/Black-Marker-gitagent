@@ -1,45 +1,54 @@
-
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AGENT_DIR="$(dirname "$SCRIPT_DIR")"
 
-# 1. Unbreakable Python parser
-PDF_PATH=$(python3 -c "
-import sys, json, os, select
-raw = ''
-if select.select([sys.stdin], [], [], 0.2)[0]: raw = sys.stdin.read().strip()
-if not raw and len(sys.argv) > 1: raw = sys.argv[1].strip()
+# 1. Safely catch the JSON payload without hanging
+PAYLOAD=""
+if [ ! -t 0 ]; then
+    PAYLOAD=$(timeout 1 cat 2>/dev/null)
+fi
+if [[ "$1" == {* ]]; then
+    PAYLOAD="$1"
+fi
 
-path = ''
-if raw:
-    try: path = json.loads(raw).get('pdf_path', '')
-    except: path = raw
+# 2. Extract variables using the safe JSON parser
+PDF_PATH=$(python3 -c "import sys, json; print(json.loads(sys.argv[1]).get('pdf_path', ''))" "$PAYLOAD" 2>/dev/null)
 
-if not path: path = os.environ.get('pdf_path', '')
-print(path.strip())
-" "$1")
+# CLI Fallback
+if [[ "$1" != {* ]] && [ -z "$PDF_PATH" ]; then
+    PDF_PATH="$1"
+fi
 
 cd "$AGENT_DIR"
 
-# 2. Fallback: If GitClaw passes a bad/empty path, grab the actual review file
-if [ ! -f "$PDF_PATH" ]; then
+# 3. Fallback: If GitClaw passes a bad/empty path, grab the actual review file
+if [ -z "$PDF_PATH" ] || [ ! -f "$PDF_PATH" ]; then
     PDF_PATH=$(ls output/*_FOR_REVIEW.pdf 2>/dev/null | head -n 1)
 fi
 
-# 3. SAFETY CHECK: If it STILL doesn't exist, abort gracefully!
+# 4. SAFETY CHECK: If it STILL doesn't exist, abort gracefully!
 if [ -z "$PDF_PATH" ] || [ ! -f "$PDF_PATH" ]; then
     echo "{\"output_path\": \"\", \"report_path\": \"\", \"exists\": false, \"error\": \"No _FOR_REVIEW.pdf file found. You must run redact-review first.\"}"
     exit 0
 fi
 
 mkdir -p output
-python3 finalize_redactions.py "$PDF_PATH" > finalize_error.log 2>&1
+python3 finalize_redactions.py "$PDF_PATH" > output/finalize_error.log 2>&1
 
+# 5. Format filenames exactly as the Python script does
 STEM=$(basename "$PDF_PATH" .pdf)
-CLEAN_STEM=${STEM/_FOR_REVIEW/_FINAL_REDACTED}
-OUTPUT="./output/${CLEAN_STEM}.pdf"
-REPORT="$./output/${CLEAN_STEM}_REDACTION_REPORT.txt"
+CLEAN_STEM=${STEM/_FOR_REVIEW/}
 
-python3 -c "import json, os; print(json.dumps({'output_path': '${OUTPUT}', 'report_path': '${REPORT}', 'exists': os.path.exists('${OUTPUT}')}))"
-EOF
-chmod +x tools/finalize-redactions.sh
+OUTPUT="./output/${CLEAN_STEM}_FINAL_REDACTED.pdf"
+
+# Fixed the $ typo in the string here
+REPORT="./output/${CLEAN_STEM}_REDACTION_REPORT.txt"
+
+python3 -c "
+import json, os
+print(json.dumps({
+    'output_path': '$OUTPUT',
+    'report_path': '$REPORT',
+    'exists': os.path.exists('$OUTPUT')
+}))
+"
