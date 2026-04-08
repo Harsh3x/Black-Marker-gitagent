@@ -7,8 +7,17 @@ mkdir -p output
 
 LOG="$AGENT_DIR/output/redact.log"
 
-# Capture everything for debugging
-RAW_INPUT=$(cat /dev/stdin 2>/dev/null || echo "")
+# Safely capture piped input ONLY if stdin is not a terminal (prevents hanging)
+RAW_INPUT=""
+if [ ! -t 0 ]; then
+    # timeout 1 acts as a safety net so it never hangs indefinitely
+    RAW_INPUT=$(timeout 1 cat 2>/dev/null)
+fi
+
+# If GitClaw passed the JSON payload as the first argument instead of piping it
+if [[ "$1" == {* ]]; then
+    RAW_INPUT="$1"
+fi
 
 {
     echo "========================================"
@@ -26,7 +35,7 @@ RAW_INPUT=$(cat /dev/stdin 2>/dev/null || echo "")
 PDF_PATH=""
 COMPLIANCE=""
 
-# Method 1: JSON stdin
+# Method 1: JSON payload (from stdin or $1)
 if [ -n "$RAW_INPUT" ]; then
     PDF_PATH=$(echo "$RAW_INPUT" | python3 -c "
 import sys,json
@@ -48,9 +57,11 @@ fi
 [ -z "$PDF_PATH" ] && PDF_PATH="${PDF_PATH:-}"
 [ -z "$COMPLIANCE" ] && COMPLIANCE="${COMPLIANCE:-}"
 
-# Method 4: CLI args
-[ -z "$PDF_PATH" ] && PDF_PATH="${1:-}"
-[ -z "$COMPLIANCE" ] && COMPLIANCE="${2:-}"
+# Method 4: CLI args (Only if $1 wasn't a JSON string)
+if [[ "$1" != {* ]]; then
+    [ -z "$PDF_PATH" ] && PDF_PATH="${1:-}"
+    [ -z "$COMPLIANCE" ] && COMPLIANCE="${2:-}"
+fi
 
 # Method 5: INPUT env var (some frameworks wrap as JSON here)
 if [ -z "$PDF_PATH" ] && [ -n "${INPUT:-}" ]; then
@@ -91,8 +102,8 @@ else
     COMPLIANCE_TAG=""
 fi
 
-OUTPUT="$AGENT_DIR/output/${STEM}${COMPLIANCE_TAG}_REDACTED.pdf"
-REPORT="$AGENT_DIR/output/${STEM}_REDACTION_REPORT.txt"
+OUTPUT="./output/${STEM}${COMPLIANCE_TAG}_REDACTED.pdf"
+REPORT="./output/${STEM}_REDACTION_REPORT.txt"
 
 {
     echo "Exit code : $EXIT_STATUS"
