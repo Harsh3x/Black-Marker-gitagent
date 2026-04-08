@@ -1,45 +1,44 @@
 
 [BLACK-MARKER] Initiating async redaction: ./input/test_deposition_2.pdf
 [BLACK-MARKER] Mode      : AUTONOMOUS (Blackout)
-[BLACK-MARKER] Compliance: DPDP Act 2023 (India)
+[BLACK-MARKER] Compliance: Full (All Frameworks)
 ==================================================
 [1/4] Extracting text & hunting for PII concurrently...
       ✓ Loaded PDF with 4 pages
-      ✓ 28 sensitive string(s) identified:
-        • [DPDP_NAME] [REDACTED]
-        • [DPDP_NAME] [REDACTED]
-        • [DPDP_DIGITAL] [REDACTED]
-        • [DPDP_CHILD] [REDACTED]
-        • [DPDP_DIGITAL] [REDACTED]
-        • [DPDP_NAME] [REDACTED]
-        • [DPDP_NAME] [REDACTED]
-        • [DPDP_CONTACT] [REDACTED]
-        • [DPDP_CHILD] [REDACTED]
-        • [DPDP_FINANCIAL] [REDACTED]
-        • [DPDP_GOVT_ID] [REDACTED]
-        • [DPDP_NAME] [REDACTED]
-        • [DPDP_NAME] [REDACTED]
-        • [DPDP_CONTACT] [REDACTED]
-        • [DPDP_CONTACT] [REDACTED]
-        • [DPDP_HEALTH] [REDACTED]
-        • [DPDP_HEALTH] [REDACTED]
-        • [DPDP_NAME] [REDACTED]
-        • [DPDP_FINANCIAL] [REDACTED]
-        • [DPDP_FINANCIAL] [REDACTED]
-        • [DPDP_FINANCIAL] [REDACTED]
-        • [DPDP_CONTACT] [REDACTED]
-        • [DPDP_CONTACT] [REDACTED]
-        • [DPDP_DIGITAL] [REDACTED]
-        • [DPDP_DIGITAL] [REDACTED]
-        • [DPDP_NAME] [REDACTED]
-        • [DPDP_NAME] [REDACTED]
-        • [DPDP_NAME] [REDACTED]
+      ✓ 27 sensitive string(s) identified:
+        • [PII_NAME] [REDACTED]
+        • [CONFIDENTIAL] [REDACTED]
+        • [PII_NAME] [REDACTED]
+        • [DOB] [REDACTED]
+        • [PII_NAME] [REDACTED]
+        • [PII_NAME] [REDACTED]
+        • [ADDRESS] [REDACTED]
+        • [DOB] [REDACTED]
+        • [SSN] [REDACTED]
+        • [LICENSE] [REDACTED]
+        • [CONFIDENTIAL] [REDACTED]
+        • [PII_NAME] [REDACTED]
+        • [PHONE] [REDACTED]
+        • [ADDRESS] [REDACTED]
+        • [MEDICAL] [REDACTED]
+        • [MEDICAL] [REDACTED]
+        • [PII_NAME] [REDACTED]
+        • [FINANCIAL] [REDACTED]
+        • [FINANCIAL] [REDACTED]
+        • [FINANCIAL] [REDACTED]
+        • [EMAIL] [REDACTED]
+        • [EMAIL] [REDACTED]
+        • [IP_ADDRESS] [REDACTED]
+        • [PII_NAME] [REDACTED]
+        • [PII_NAME] [REDACTED]
+        • [PII_NAME] [REDACTED]
+        • [DOB] [REDACTED]
 
 [2/4] Searching PDF for exact text locations...
-      ✓ 39 location(s) mapped
+      ✓ 38 location(s) mapped
 
 [3/4] Applying permanent black-box redactions...
-      ✓ 39 box(es) applied → output/test_deposition_2_DPDP_REDACTED.pdf
+      ✓ 38 box(es) applied → output/test_deposition_2_REDACTED.pdf
 
 [4/4] Generating report...
 
@@ -48,32 +47,36 @@
        BLACK-MARKER REDACTION REPORT
 ==========================================
 Document   : test_deposition_2.pdf
-Processed  : 2026-04-08 11:55:03
+Processed  : 2026-04-08 11:57:26
 Model      : gpt-4o-mini (Async)
-Compliance : DPDP Act 2023 (India)
+Compliance : Full (All Frameworks)
 
 SUMMARY
 -------
-Unique sensitive strings : 28
-Redaction boxes applied  : 39
+Unique sensitive strings : 27
+Redaction boxes applied  : 38
 Pages affected           : 1, 2, 3, 4
-Output file              : test_deposition_2_DPDP_REDACTED.pdf
+Output file              : test_deposition_2_REDACTED.pdf
 
 REDACTIONS BY CATEGORY
 ----------------------
 Category                                  Strings   Boxes
 ----------------------------------------  --------  ------
-DPDP — Child Data (S.9)                         2       2
-DPDP — Contact Information                      5       9
-DPDP — Digital Identifier                       4       4
-DPDP — Financial Data                           4       4
-DPDP — Government ID                            1       1
-DPDP — Health Data                              2       2
-DPDP — Name                                    10      17
+Address                                         2       6
+Confidential / Proprietary                      2       2
+Date of Birth                                   3       3
+Email Address                                   2       2
+Financial Data                                  3       3
+IP Address                                      1       1
+License / ID Number                             1       1
+Medical Information                             2       2
+Phone Number                                    1       1
+Personal Name                                   9      16
+Social Security Number                          1       1
 
 ==========================================
 Original file NOT placed in /output.
 Metadata scrubbed. Only the redacted copy exists.
 ==========================================
 
-Task complete! Check output/test_deposition_2_DPDP_REDACTED.pdf
+Task complete! Check output/test_deposition_2_REDACTED.pdf
