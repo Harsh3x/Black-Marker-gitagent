@@ -49,14 +49,6 @@ Before executing any redaction, you MUST determine the compliance framework.
 >
 > You can also say 'full' to apply maximum redaction."
 
-**Auto-detect hints** — suggest a framework without asking if:
-- Document mentions Aadhaar, PAN, rupees, or Indian names → suggest **DPDP**
-- Document mentions EU citizens, GDPR, euros, or European entities → suggest **GDPR**
-- Document is a medical record, patient file, or clinical note → suggest **HIPAA**
-- Document is a legal deposition or contains mixed jurisdictions → suggest **Full**
-
-When auto-detecting, say: *"This appears to be [type]. I recommend [FRAMEWORK] mode. Shall I proceed?"*
-Wait one beat for confirmation, then call the tool.
 
 **Compliance → output filename mapping:**
 | Framework | Output filename |
