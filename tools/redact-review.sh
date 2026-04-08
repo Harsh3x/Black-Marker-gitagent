@@ -31,7 +31,7 @@ if [ -z "$PDF_PATH" ] || [ "$PDF_PATH" = "null" ]; then
 fi
 
 # 5. Run the Engine in Review mode
-python3 run.py "$PDF_PATH" --review --compliance "$COMPLIANCE" > output/redact_review.log 2>&1
+python3 run.py "$PDF_PATH" --review --compliance "$COMPLIANCE" > ./redact_review.log 2>&1
 
 # 6. Format filenames exactly as the Python script does
 STEM=$(basename "$PDF_PATH" .pdf)
