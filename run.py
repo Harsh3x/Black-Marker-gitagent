@@ -381,7 +381,8 @@ def generate_report(
     report += "==========================================\n"
 
     stem = Path(pdf_path).stem
-    with open(f"output/{stem}_REDACTION_REPORT.txt", "w") as fh:
+    compliance_tag = f"_{compliance.upper()}" if compliance != "full" else ""
+    with open(f"output/{stem}{compliance_tag}_REDACTION_REPORT.txt", "w") as fh:
         fh.write(report)
 
     return report
