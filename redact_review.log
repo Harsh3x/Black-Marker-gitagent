@@ -1,47 +1,44 @@
 
 [BLACK-MARKER] Initiating async redaction: ./input/test_deposition_2.pdf
 [BLACK-MARKER] Mode      : REVIEW (Highlights)
-[BLACK-MARKER] Compliance: GDPR (EU)
+[BLACK-MARKER] Compliance: HIPAA (US Health)
 ==================================================
 [1/4] Extracting text & hunting for PII concurrently...
       ✓ Loaded PDF with 4 pages
-      ✓ 30 sensitive string(s) identified:
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_LOCATION] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_SPECIAL] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_ONLINE] [REDACTED]
-        • [GDPR_LOCATION] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_HEALTH] [REDACTED]
-        • [GDPR_HEALTH] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_LOCATION] [REDACTED]
-        • [GDPR_FINANCIAL] [REDACTED]
-        • [GDPR_FINANCIAL] [REDACTED]
-        • [GDPR_LOCATION] [REDACTED]
-        • [GDPR_FINANCIAL] [REDACTED]
-        • [GDPR_ONLINE] [REDACTED]
-        • [GDPR_ONLINE] [REDACTED]
-        • [GDPR_ONLINE] [REDACTED]
-        • [GDPR_ONLINE] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
-        • [GDPR_LOCATION] [REDACTED]
-        • [GDPR_PERSONAL] [REDACTED]
+      ✓ 27 sensitive string(s) identified:
+        • [PHI_NAME] [REDACTED]
+        • [PHI_NAME] [REDACTED]
+        • [PHI_DATE] [REDACTED]
+        • [PHI_OTHER] [REDACTED]
+        • [PHI_GEOGRAPHIC] [REDACTED]
+        • [PHI_DATE] [REDACTED]
+        • [PHI_SSN] [REDACTED]
+        • [PHI_LICENSE] [REDACTED]
+        • [PHI_NAME] [REDACTED]
+        • [PHI_NAME] [REDACTED]
+        • [PHI_PHONE] [REDACTED]
+        • [PHI_GEOGRAPHIC] [REDACTED]
+        • [PHI_NAME] [REDACTED]
+        • [PHI_MEDICAL_RECORD] [REDACTED]
+        • [PHI_MEDICAL_RECORD] [REDACTED]
+        • [PHI_NAME] [REDACTED]
+        • [PHI_OTHER] [REDACTED]
+        • [PHI_OTHER] [REDACTED]
+        • [PHI_ACCOUNT] [REDACTED]
+        • [PHI_OTHER] [REDACTED]
+        • [PHI_EMAIL] [REDACTED]
+        • [PHI_EMAIL] [REDACTED]
+        • [PHI_IP] [REDACTED]
+        • [PHI_NAME] [REDACTED]
+        • [PHI_NAME] [REDACTED]
+        • [PHI_DATE] [REDACTED]
+        • [PHI_LICENSE] [REDACTED]
 
 [2/4] Searching PDF for exact text locations...
-      ✓ 44 location(s) mapped
+      ✓ 40 location(s) mapped
 
 [3/4] Applying yellow highlights for human review...
-      ✓ 44 box(es) applied → output/test_deposition_2_GDPR_FOR_REVIEW.pdf
+      ✓ 40 box(es) applied → output/test_deposition_2_HIPAA_FOR_REVIEW.pdf
 
 [4/4] Generating report...
 
@@ -50,31 +47,36 @@
        BLACK-MARKER REDACTION REPORT
 ==========================================
 Document   : test_deposition_2.pdf
-Processed  : 2026-04-08 18:45:42
+Processed  : 2026-04-08 18:48:37
 Model      : gpt-4o-mini (Async)
-Compliance : GDPR (EU)
+Compliance : HIPAA (US Health)
 
 SUMMARY
 -------
-Unique sensitive strings : 30
-Redaction boxes applied  : 44
+Unique sensitive strings : 27
+Redaction boxes applied  : 40
 Pages affected           : 1, 2, 3, 4
-Output file              : test_deposition_2_GDPR_FOR_REVIEW.pdf
+Output file              : test_deposition_2_HIPAA_FOR_REVIEW.pdf
 
 REDACTIONS BY CATEGORY
 ----------------------
 Category                                  Strings   Boxes
 ----------------------------------------  --------  ------
-GDPR — Financial Data                           3       6
-GDPR — Health Data                              2       2
-GDPR — Location Data                            5       9
-GDPR — Online Identifier                        5       5
-GDPR — Personal Data (Art. 4)                  14      21
-GDPR — Special Category (Art. 9)                1       1
+PHI — Account Number                            1       1
+PHI — Date                                      3       3
+PHI — Email                                     2       2
+PHI — Geographic Data                           2       6
+PHI — IP Address                                1       1
+PHI — Certificate / License                     2       2
+PHI — Medical Record                            2       2
+PHI — Name                                      8      17
+PHI — Other Unique Identifier                   4       4
+PHI — Phone / Fax                               1       1
+PHI — Social Security Number                    1       1
 
 ==========================================
 Original file NOT placed in /output.
 Metadata scrubbed. Only the redacted copy exists.
 ==========================================
 
-Task complete! Check output/test_deposition_2_GDPR_FOR_REVIEW.pdf
+Task complete! Check output/test_deposition_2_HIPAA_FOR_REVIEW.pdf
