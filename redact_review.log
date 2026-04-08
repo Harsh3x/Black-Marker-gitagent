@@ -5,7 +5,8 @@
 ==================================================
 [1/4] Extracting text & hunting for PII concurrently...
       ✓ Loaded PDF with 4 pages
-      ✓ 25 sensitive string(s) identified:
+      ✓ 30 sensitive string(s) identified:
+        • [GDPR_PERSONAL] [REDACTED]
         • [GDPR_PERSONAL] [REDACTED]
         • [GDPR_PERSONAL] [REDACTED]
         • [GDPR_PERSONAL] [REDACTED]
@@ -22,21 +23,25 @@
         • [GDPR_HEALTH] [REDACTED]
         • [GDPR_HEALTH] [REDACTED]
         • [GDPR_PERSONAL] [REDACTED]
+        • [GDPR_LOCATION] [REDACTED]
         • [GDPR_FINANCIAL] [REDACTED]
         • [GDPR_FINANCIAL] [REDACTED]
+        • [GDPR_LOCATION] [REDACTED]
         • [GDPR_FINANCIAL] [REDACTED]
+        • [GDPR_ONLINE] [REDACTED]
         • [GDPR_ONLINE] [REDACTED]
         • [GDPR_ONLINE] [REDACTED]
         • [GDPR_ONLINE] [REDACTED]
         • [GDPR_PERSONAL] [REDACTED]
         • [GDPR_PERSONAL] [REDACTED]
+        • [GDPR_LOCATION] [REDACTED]
         • [GDPR_PERSONAL] [REDACTED]
 
 [2/4] Searching PDF for exact text locations...
-      ✓ 43 location(s) mapped
+      ✓ 44 location(s) mapped
 
 [3/4] Applying yellow highlights for human review...
-      ✓ 43 box(es) applied → output/test_deposition_2_GDPR_FOR_REVIEW.pdf
+      ✓ 44 box(es) applied → output/test_deposition_2_GDPR_FOR_REVIEW.pdf
 
 [4/4] Generating report...
 
@@ -45,14 +50,14 @@
        BLACK-MARKER REDACTION REPORT
 ==========================================
 Document   : test_deposition_2.pdf
-Processed  : 2026-04-08 18:33:20
+Processed  : 2026-04-08 18:45:42
 Model      : gpt-4o-mini (Async)
 Compliance : GDPR (EU)
 
 SUMMARY
 -------
-Unique sensitive strings : 25
-Redaction boxes applied  : 43
+Unique sensitive strings : 30
+Redaction boxes applied  : 44
 Pages affected           : 1, 2, 3, 4
 Output file              : test_deposition_2_GDPR_FOR_REVIEW.pdf
 
@@ -60,11 +65,11 @@ REDACTIONS BY CATEGORY
 ----------------------
 Category                                  Strings   Boxes
 ----------------------------------------  --------  ------
-GDPR — Financial Data                           3       3
+GDPR — Financial Data                           3       6
 GDPR — Health Data                              2       2
-GDPR — Location Data                            2       6
-GDPR — Online Identifier                        4       4
-GDPR — Personal Data (Art. 4)                  13      27
+GDPR — Location Data                            5       9
+GDPR — Online Identifier                        5       5
+GDPR — Personal Data (Art. 4)                  14      21
 GDPR — Special Category (Art. 9)                1       1
 
 ==========================================
