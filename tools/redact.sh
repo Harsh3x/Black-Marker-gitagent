@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AGENT_DIR="$(dirname "$SCRIPT_DIR")"
 
@@ -34,14 +33,21 @@ rm -f "$TMPFILE"
 cd "$AGENT_DIR"
 mkdir -p output
 
-LOG="output/redact.log"
-echo "========================================" >> "$LOG"
-echo "Timestamp : $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$LOG"
-echo "PDF       : $PDF_PATH" >> "$LOG"
-echo "Compliance: $COMPLIANCE" >> "$LOG"
-echo "----------------------------------------" >> "$LOG"
+# Use absolute path so log is always written regardless of working dir
+LOG="$AGENT_DIR/output/redact.log"
 
+{
+    echo "========================================"
+    echo "Timestamp : $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+    echo "PDF       : $PDF_PATH"
+    echo "Compliance: $COMPLIANCE"
+    echo "----------------------------------------"
+} >> "$LOG"
+
+# Run python — capture exit code even if it fails, don't let set -e kill us
+set -o pipefail
 python3 run.py "$PDF_PATH" --compliance "$COMPLIANCE" 2>&1 | tee -a "$LOG"
+EXIT_STATUS=${PIPESTATUS[0]}
 
 STEM=$(basename "$PDF_PATH" .pdf)
 if [ "$COMPLIANCE" != "full" ]; then
@@ -53,10 +59,12 @@ fi
 OUTPUT="$AGENT_DIR/output/${STEM}${COMPLIANCE_TAG}_REDACTED.pdf"
 REPORT="$AGENT_DIR/output/${STEM}_REDACTION_REPORT.txt"
 
-EXIT_STATUS=$?
-echo "Exit code : $EXIT_STATUS" >> "$LOG"
-echo "Output    : $OUTPUT" >> "$LOG"
-echo "========================================" >> "$LOG"
+{
+    echo "Exit code : $EXIT_STATUS"
+    echo "Output    : $OUTPUT"
+    echo "========================================"
+    echo ""
+} >> "$LOG"
 
 python3 -c "
 import json, os
@@ -66,3 +74,5 @@ print(json.dumps({
     'exists': os.path.exists('$OUTPUT')
 }))
 "
+
+exit $EXIT_STATUS
