@@ -7,7 +7,11 @@ input_schema:
     pdf_path:
       type: string
       description: Path to the _FOR_REVIEW.pdf to finalize
-  required: [pdf_path]
+   compliance:
+      type: string
+      description: Compliance mode - hipaa, gdpr, dpdp, or full
+      enum: [hipaa, gdpr, dpdp, full]
+  required: [pdf_path, compliance]
 implementation:
   script: finalize-redactions.sh
   runtime: bash
