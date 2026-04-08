@@ -3,7 +3,6 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AGENT_DIR="$(dirname "$SCRIPT_DIR")"
 
-# Save stdin to a temp file to avoid consuming it twice
 TMPFILE=$(mktemp)
 cat /dev/stdin > "$TMPFILE"
 
@@ -21,7 +20,7 @@ COMPLIANCE=$(python3 - "$TMPFILE" << 'PYEOF'
 import sys, json
 try:
     raw = open(sys.argv[1]).read().strip()
-    print(json.loads(raw).get('compliance'))
+    print(json.loads(raw).get('compliance') or 'full')
 except:
     print('full')
 PYEOF
@@ -29,14 +28,20 @@ PYEOF
 
 rm -f "$TMPFILE"
 
-# Fallback if empty
 [ -z "$PDF_PATH" ] || [ "$PDF_PATH" = "null" ] && PDF_PATH=$(ls *.pdf 2>/dev/null | head -n 1)
 [ -z "$COMPLIANCE" ] || [ "$COMPLIANCE" = "null" ] && COMPLIANCE="full"
 
 cd "$AGENT_DIR"
 mkdir -p output
 
-python3 run.py "$PDF_PATH" --compliance "$COMPLIANCE"
+LOG="output/redact.log"
+echo "========================================" >> "$LOG"
+echo "Timestamp : $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$LOG"
+echo "PDF       : $PDF_PATH" >> "$LOG"
+echo "Compliance: $COMPLIANCE" >> "$LOG"
+echo "----------------------------------------" >> "$LOG"
+
+python3 run.py "$PDF_PATH" --compliance "$COMPLIANCE" 2>&1 | tee -a "$LOG"
 
 STEM=$(basename "$PDF_PATH" .pdf)
 if [ "$COMPLIANCE" != "full" ]; then
@@ -47,6 +52,11 @@ fi
 
 OUTPUT="$AGENT_DIR/output/${STEM}${COMPLIANCE_TAG}_REDACTED.pdf"
 REPORT="$AGENT_DIR/output/${STEM}_REDACTION_REPORT.txt"
+
+EXIT_STATUS=$?
+echo "Exit code : $EXIT_STATUS" >> "$LOG"
+echo "Output    : $OUTPUT" >> "$LOG"
+echo "========================================" >> "$LOG"
 
 python3 -c "
 import json, os

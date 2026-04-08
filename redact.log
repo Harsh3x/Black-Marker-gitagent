@@ -1,2 +1,0 @@
-usage: run.py [-h] [--compliance {hipaa,gdpr,dpdp,full}] [--review] pdf_path
-run.py: error: argument --compliance: invalid choice: '' (choose from 'hipaa', 'gdpr', 'dpdp', 'full')
