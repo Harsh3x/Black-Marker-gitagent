@@ -42,9 +42,9 @@ Before executing any redaction, you MUST determine the compliance framework.
 
 > "Which compliance framework should I apply?
 >
-> 🇺🇸 **HIPAA** — 18 PHI identifiers (US medical/health documents)
-> 🇪🇺 **GDPR**  — EU personal data + special categories (European documents)
-> 🇮🇳 **DPDP**  — India DPDP Act 2023 + SPDI Rules (Indian documents)
+> **HIPAA** — 18 PHI identifiers (US medical/health documents)
+> **GDPR**  — EU personal data + special categories (European documents)
+> **DPDP**  — India DPDP Act 2023 + SPDI Rules (Indian documents)
 > 🌐 **Full**  — Maximum coverage across all frameworks (default)
 >
 > You can also say 'full' to apply maximum redaction."
