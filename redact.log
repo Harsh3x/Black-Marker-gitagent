@@ -1,19 +1,79 @@
 
-[BLACK-MARKER] Initiating async redaction: ./input/file3.pdf
-[BLACK-MARKER] Mode: AUTONOMOUS (Blackout)
+[BLACK-MARKER] Initiating async redaction: ./input/test_deposition_2.pdf
+[BLACK-MARKER] Mode      : AUTONOMOUS (Blackout)
+[BLACK-MARKER] Compliance: DPDP Act 2023 (India)
 ==================================================
-[1/4] Extracting text & Hunting for PII concurrently...
-Traceback (most recent call last):
-  File "/home/harsh/Desktop/gitagent/run.py", line 357, in <module>
-    asyncio.run(redact_async(args.pdf_path, args.review))
-  File "/usr/lib/python3.10/asyncio/runners.py", line 44, in run
-    return loop.run_until_complete(main)
-  File "/usr/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
-    return future.result()
-  File "/home/harsh/Desktop/gitagent/run.py", line 317, in redact_async
-    findings = await process_document_async(pdf_path)
-  File "/home/harsh/Desktop/gitagent/run.py", line 90, in process_document_async
-    doc = fitz.open(pdf_path)
-  File "/home/harsh/.local/lib/python3.10/site-packages/pymupdf/__init__.py", line 2990, in __init__
-    raise FileNotFoundError(f"no such file: '{filename}'")
-pymupdf.FileNotFoundError: no such file: './input/file3.pdf'
+[1/4] Extracting text & hunting for PII concurrently...
+      ✓ Loaded PDF with 4 pages
+      ✓ 28 sensitive string(s) identified:
+        • [DPDP_NAME] [REDACTED]
+        • [DPDP_NAME] [REDACTED]
+        • [DPDP_DIGITAL] [REDACTED]
+        • [DPDP_CHILD] [REDACTED]
+        • [DPDP_DIGITAL] [REDACTED]
+        • [DPDP_NAME] [REDACTED]
+        • [DPDP_NAME] [REDACTED]
+        • [DPDP_CONTACT] [REDACTED]
+        • [DPDP_CHILD] [REDACTED]
+        • [DPDP_FINANCIAL] [REDACTED]
+        • [DPDP_GOVT_ID] [REDACTED]
+        • [DPDP_NAME] [REDACTED]
+        • [DPDP_NAME] [REDACTED]
+        • [DPDP_CONTACT] [REDACTED]
+        • [DPDP_CONTACT] [REDACTED]
+        • [DPDP_HEALTH] [REDACTED]
+        • [DPDP_HEALTH] [REDACTED]
+        • [DPDP_NAME] [REDACTED]
+        • [DPDP_FINANCIAL] [REDACTED]
+        • [DPDP_FINANCIAL] [REDACTED]
+        • [DPDP_FINANCIAL] [REDACTED]
+        • [DPDP_CONTACT] [REDACTED]
+        • [DPDP_CONTACT] [REDACTED]
+        • [DPDP_DIGITAL] [REDACTED]
+        • [DPDP_DIGITAL] [REDACTED]
+        • [DPDP_NAME] [REDACTED]
+        • [DPDP_NAME] [REDACTED]
+        • [DPDP_NAME] [REDACTED]
+
+[2/4] Searching PDF for exact text locations...
+      ✓ 39 location(s) mapped
+
+[3/4] Applying permanent black-box redactions...
+      ✓ 39 box(es) applied → output/test_deposition_2_DPDP_REDACTED.pdf
+
+[4/4] Generating report...
+
+==================================================
+==========================================
+       BLACK-MARKER REDACTION REPORT
+==========================================
+Document   : test_deposition_2.pdf
+Processed  : 2026-04-08 11:55:03
+Model      : gpt-4o-mini (Async)
+Compliance : DPDP Act 2023 (India)
+
+SUMMARY
+-------
+Unique sensitive strings : 28
+Redaction boxes applied  : 39
+Pages affected           : 1, 2, 3, 4
+Output file              : test_deposition_2_DPDP_REDACTED.pdf
+
+REDACTIONS BY CATEGORY
+----------------------
+Category                                  Strings   Boxes
+----------------------------------------  --------  ------
+DPDP — Child Data (S.9)                         2       2
+DPDP — Contact Information                      5       9
+DPDP — Digital Identifier                       4       4
+DPDP — Financial Data                           4       4
+DPDP — Government ID                            1       1
+DPDP — Health Data                              2       2
+DPDP — Name                                    10      17
+
+==========================================
+Original file NOT placed in /output.
+Metadata scrubbed. Only the redacted copy exists.
+==========================================
+
+Task complete! Check output/test_deposition_2_DPDP_REDACTED.pdf

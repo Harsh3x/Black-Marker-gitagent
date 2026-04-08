@@ -19,6 +19,9 @@ if not path: path = os.environ.get('pdf_path', '')
 print(path.strip())
 " "$1")
 
+COMPLIANCE=$(python3 -c "import sys, json, os; raw=os.environ.get('INPUT', '{}'); print(json.loads(raw if raw else '{}').get('compliance', 'full'))")
+
+
 cd "$AGENT_DIR"
 
 # 2. The Resilience Fallback: If GitClaw drops the payload, just find the PDF!
@@ -27,12 +30,18 @@ if [ -z "$PDF_PATH" ] || [ "$PDF_PATH" == "null" ]; then
 fi
 
 mkdir -p output
-python3 run.py "$PDF_PATH" > redact.log 2>&1
+python3 run.py "$PDF_PATH" --compliance "$COMPLIANCE" > redact.log 2>&1
 
 STEM=$(basename "$PDF_PATH" .pdf)
-OUTPUT="./output/${STEM}_REDACTED.pdf"
-REPORT="./output/${STEM}_REDACTION_REPORT.txt"
+if [ "$COMPLIANCE" != "full" ]; then
+    COMPLIANCE_TAG="_$(echo $COMPLIANCE | tr '[:lower:]' '[:upper:]')"
+else
+    COMPLIANCE_TAG=""
+fi
+
+
+OUTPUT="./output/${STEM}${COMPLIANCE_TAG}_REDACTED.pdf"
+REPORT="./output/${STEM}${COMPLIANCE_TAG}_REDACTION_REPORT.txt"
 
 python3 -c "import json, os; print(json.dumps({'output_path': '${OUTPUT}', 'report_path': '${REPORT}', 'exists': os.path.exists('${OUTPUT}')}))"
-EOF
-chmod +x tools/redact.sh
+

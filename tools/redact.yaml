@@ -8,7 +8,11 @@ input_schema:
     pdf_path:
       type: string
       description: Path to the PDF file to redact
-  required: [pdf_path]
+    compliance:
+      type: string
+      description: Compliance mode - hipaa, gdpr, dpdp, or full
+      enum: [hipaa, gdpr, dpdp, full]
+  required: [pdf_path, compliance]
 implementation:
   script: redact.sh
   runtime: bash
