@@ -418,11 +418,13 @@ async def redact_async(pdf_path: str, review_mode: bool, compliance: str):
     print(f"      ✓ {len(redactions)} location(s) mapped")
 
     stem = Path(pdf_path).stem
+    # Calculate the tag once for all outputs
+    compliance_tag = f"_{compliance.upper()}" if compliance != "full" else ""
+
     if review_mode:
-        output_path = f"output/{stem}_FOR_REVIEW.pdf"
+        output_path = f"output/{stem}{compliance_tag}_FOR_REVIEW.pdf"
         print(f"\n[3/4] Applying yellow highlights for human review...")
     else:
-        compliance_tag = f"_{compliance.upper()}" if compliance != "full" else ""
         output_path = f"output/{stem}{compliance_tag}_REDACTED.pdf"
         print(f"\n[3/4] Applying permanent black-box redactions...")
 
