@@ -40,10 +40,22 @@ STEM=$(basename "$PDF_PATH" .pdf)
 CLEAN_STEM=${STEM/_FOR_REVIEW/}
 
 OUTPUT="./output/${CLEAN_STEM}_FINAL_REDACTED.pdf"
-
-# Fixed the $ typo in the string here
 REPORT="./output/${CLEAN_STEM}_REDACTION_REPORT.txt"
 
+# 6. CLEANUP PHASE: Destroy originals and logs if the final file exists
+if [ -f "$OUTPUT" ]; then
+    # Delete the yellow-highlighted review file
+    rm -f "$PDF_PATH" 
+    
+    # Delete the error log
+    rm -f output/finalize_error.log 
+    
+    # Strip compliance tags to find and destroy the original unredacted source PDF
+    ORIGINAL_BASE=$(echo "$CLEAN_STEM" | sed -E 's/_(HIPAA|GDPR|DPDP)$//')
+    rm -f "./${ORIGINAL_BASE}.pdf"
+fi
+
+# 7. Return JSON to GitClaw
 python3 -c "
 import json, os
 print(json.dumps({

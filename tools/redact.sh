@@ -5,7 +5,7 @@ AGENT_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$AGENT_DIR"
 mkdir -p output
 
-LOG="$AGENT_DIR/output/redact.log"
+LOG="$AGENT_DIR/redact.log"
 
 # Safely capture piped input ONLY if stdin is not a terminal (prevents hanging)
 RAW_INPUT=""
