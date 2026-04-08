@@ -2,50 +2,64 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AGENT_DIR="$(dirname "$SCRIPT_DIR")"
 
-TMPFILE=$(mktemp)
-cat /dev/stdin > "$TMPFILE"
-
-PDF_PATH=$(python3 - "$TMPFILE" << 'PYEOF'
-import sys, json
-try:
-    raw = open(sys.argv[1]).read().strip()
-    print(json.loads(raw).get('pdf_path', ''))
-except:
-    print('')
-PYEOF
-)
-
-COMPLIANCE=$(python3 - "$TMPFILE" << 'PYEOF'
-import sys, json
-try:
-    raw = open(sys.argv[1]).read().strip()
-    print(json.loads(raw).get('compliance') or 'full')
-except:
-    print('full')
-PYEOF
-)
-
-rm -f "$TMPFILE"
-
-[ -z "$PDF_PATH" ] || [ "$PDF_PATH" = "null" ] && PDF_PATH=$(ls *.pdf 2>/dev/null | head -n 1)
-[ -z "$COMPLIANCE" ] || [ "$COMPLIANCE" = "null" ] && COMPLIANCE="full"
-
 cd "$AGENT_DIR"
 mkdir -p output
 
-# Use absolute path so log is always written regardless of working dir
 LOG="$AGENT_DIR/output/redact.log"
+
+# Capture raw stdin immediately and log it for debugging
+RAW_INPUT=$(cat /dev/stdin)
 
 {
     echo "========================================"
     echo "Timestamp : $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-    echo "PDF       : $PDF_PATH"
-    echo "Compliance: $COMPLIANCE"
+    echo "RAW_INPUT : $RAW_INPUT"
+    echo "ARGS      : $@"
+    echo "ENV pdf_path: ${pdf_path:-}"
+    echo "ENV compliance: ${compliance:-}"
+} >> "$LOG"
+
+# Try all possible ways gitclaw could pass the input
+PDF_PATH=""
+COMPLIANCE=""
+
+# Method 1: JSON stdin
+if [ -n "$RAW_INPUT" ]; then
+    PDF_PATH=$(echo "$RAW_INPUT" | python3 -c "
+import sys, json
+try:
+    data = json.loads(sys.stdin.read().strip())
+    print(data.get('pdf_path', ''))
+except Exception as e:
+    print('')
+" 2>/dev/null)
+    COMPLIANCE=$(echo "$RAW_INPUT" | python3 -c "
+import sys, json
+try:
+    data = json.loads(sys.stdin.read().strip())
+    print(data.get('compliance', '') or '')
+except Exception as e:
+    print('')
+" 2>/dev/null)
+fi
+
+# Method 2: Environment variables (some gitclaw versions pass this way)
+[ -z "$PDF_PATH" ] && PDF_PATH="${pdf_path:-}"
+[ -z "$COMPLIANCE" ] && COMPLIANCE="${compliance:-}"
+
+# Method 3: CLI args
+[ -z "$PDF_PATH" ] && PDF_PATH="${1:-}"
+
+# Method 4: Fallback to first PDF in dir
+[ -z "$PDF_PATH" ] || [ "$PDF_PATH" = "null" ] && PDF_PATH=$(ls input/*.pdf 2>/dev/null | head -n 1)
+[ -z "$COMPLIANCE" ] || [ "$COMPLIANCE" = "null" ] && COMPLIANCE="full"
+
+{
+    echo "PARSED PDF_PATH   : $PDF_PATH"
+    echo "PARSED COMPLIANCE : $COMPLIANCE"
     echo "----------------------------------------"
 } >> "$LOG"
 
-# Run python — capture exit code even if it fails, don't let set -e kill us
-set -o pipefail
 python3 run.py "$PDF_PATH" --compliance "$COMPLIANCE" 2>&1 | tee -a "$LOG"
 EXIT_STATUS=${PIPESTATUS[0]}
 
